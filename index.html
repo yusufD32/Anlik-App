@@ -37,7 +37,44 @@
             </div>
 
             <button id="login-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Giriş Yap</button>
+            <a id="to-register" class="d-block text-center text-primary mt-3 small" style="cursor:pointer; text-decoration:underline;" href="document.getElementById('register-btn').click()">Hesabınız Yoksa Oturum Açın</a>
             <div id="login-error" class="text-danger mt-3 text-center small fw-bold"></div>
+        </div>
+    </div>
+
+    <div id="view-register" class="d-flex justify-content-center align-items-center vh-100 bg-white">
+        <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
+            <div class="text-center mb-4">
+                <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-bolt fa-3x"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Kayıt Ol</h3>
+                <p class="text-muted">Anlık'a hoş geldin!</p>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input type="text" id="name-input" class="form-control" placeholder="Adınızı Giriniz">
+                <label>Adınız</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" id="lastname-input" class="form-control" placeholder="Soyadınızı Giriniz">
+                <label>Soyadınız</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" id="phonenumber-input" class="form-control" placeholder="Telefon Numaranızı Giriniz">
+                <label>Telefon Numarası</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" id="email-input" class="form-control" placeholder="name@example.com">
+                <label>Email Adresi</label>
+            </div>
+            <div class="form-floating mb-4">
+                <input type="password" id="password-input" class="form-control" placeholder="Password">
+                <label>Şifre</label>
+            </div>
+
+            <button id="register-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Kayıt Ol</button>
+            <div id="register-error" class="text-danger mt-3 text-center small fw-bold"></div>
         </div>
     </div>
 
@@ -84,10 +121,10 @@
     <div id="view-profile" class="container-fluid page-container d-none">
     <div class="row h-100">
         <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
-            <div class="Logo" onclick="router('view-home')" style="cursor: pointer;">
+            <div class="Logo" onclick="router('view-home')" style="cursor: pointer; width: 60px; height: 60px;">
                 <i class="fa-solid fa-arrow-left text-warning"></i> </div>
             
-            <div class="KategoriKutusu mt-4">
+            <div class="KategoriKutusu mt-4 " class="sticky">
                 <h5 class="KategoriBaslik">MENÜ</h5>
                 <ul class="KategoriListesi">
                     <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
