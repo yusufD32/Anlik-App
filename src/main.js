@@ -329,6 +329,22 @@ if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-cre
 const cancelCreateBtn = document.getElementById('btn-cancel-create'); 
 if(cancelCreateBtn) cancelCreateBtn.addEventListener('click', () => router('view-home'));
 
+// About/Contact overlay toggles (logo click opens it)
+const openAboutBtn = document.getElementById('btn-open-about');
+const aboutOverlay = document.getElementById('view-about');
+const closeAboutBtn = document.getElementById('btn-close-about');
+if (openAboutBtn && aboutOverlay) {
+  openAboutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    aboutOverlay.classList.remove('d-none');
+  });
+}
+if (closeAboutBtn && aboutOverlay) {
+  closeAboutBtn.addEventListener('click', () => {
+    aboutOverlay.classList.add('d-none');
+  });
+}
+
 
 
 const saveBtn = document.getElementById('btn-save');
