@@ -5,7 +5,7 @@ import 'bootstrap';
 
 
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, doc, arrayUnion, increment, updateDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
 
 // HTML Elementlerini Seçme
@@ -100,7 +100,7 @@ async function loadEvents() {
 
       // --- loadEvents İÇİNDEKİ YENİ KART HTML ŞABLONU ---
 
-const html = `
+  const html = `
 <div class="EtkinlikKartlari shadow-sm">
     
     <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" 
@@ -116,8 +116,10 @@ const html = `
         <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
             ${userJoined ? 'Katıldın' : 'Katıl'}
         </button>
-        <i class="fa-solid fa-chevron-down ok-ikonu"></i>
+      <i class="fa-solid fa-chevron-down ok-ikonu" data-id="${id}" style="cursor:pointer"></i>
     </div>
+
+    <!-- details will be inserted below this card when requested -->
 
     <div class="Kontenjan">
         <span>${data.katilimciSayisi}</span>
@@ -134,6 +136,14 @@ const html = `
               katil(id);
           });
       });
+
+        // Detay açma/kapama için ok ikonuna tıklama dinleyicisi
+        document.querySelectorAll('.ok-ikonu').forEach(icon => {
+          icon.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            await showEventDetails(id);
+          });
+        });
 
   } catch (error) {
       console.error("Veri çekme hatası:", error);
@@ -157,6 +167,76 @@ async function katil(docId) {
   } catch (error) {
       console.error("Katılma hatası:", error);
       alert("Bir hata oluştu: " + error.message);
+  }
+}
+
+// Etkinlik detaylarını getir ve göster (sade ve anlaşılır)
+async function showEventDetails(docId) {
+  if (!docId) return;
+
+  try {
+    // Hangi karta ait olduğunu bul
+    const icon = document.querySelector(`.ok-ikonu[data-id="${docId}"]`);
+    if (!icon) return;
+    const card = icon.closest('.EtkinlikKartlari');
+    if (!card) return;
+
+    // Zaten altında bir detay div'i varsa onu kapat (toggle)
+    const next = card.nextElementSibling;
+    if (next && next.classList.contains('EtkinlikDetayInline') && next.dataset.id === docId) {
+      next.remove();
+      return;
+    }
+
+    // Geçici yükleniyor göstergesi ekle
+    const detailDiv = document.createElement('div');
+    detailDiv.className = 'EtkinlikDetayInline';
+    detailDiv.dataset.id = docId;
+    detailDiv.textContent = 'Yükleniyor...';
+    card.parentNode.insertBefore(detailDiv, card.nextSibling);
+
+    // Veriyi çek
+    const snap = await getDoc(doc(db, 'events', docId));
+    if (!snap.exists()) {
+      detailDiv.textContent = 'Etkinlik bulunamadı.';
+      return;
+    }
+
+    const data = snap.data();
+
+    // Saat:dakika biçiminde zaman
+    let timeStr = '-';
+    if (data.olusturulmaTarihi) {
+      const d = new Date(data.olusturulmaTarihi);
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      timeStr = `${hh}:${mm}`;
+    }
+
+    // Açıklamayı güvenli şekilde göster (basit kaçış)
+    const escapeHtml = (str) => {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    };
+
+    const aciklamaHtml = data.aciklama ? escapeHtml(data.aciklama) : '<span class="text-muted">Açıklama yok.</span>';
+
+    // Basit, okunaklı detay içeriği
+    detailDiv.innerHTML = `
+      <div style="display:flex; flex-direction:column;">
+        <div style="font-size:0.95rem; color:#222;"><strong>Oluşturan:</strong> ${data.olusturanEmail || '-'}</div>
+        <div style="font-size:0.9rem; color:#666; margin-top:6px;"><strong>Zaman:</strong> ${timeStr}</div>
+        <div class="detay-aciklama">${aciklamaHtml}</div>
+      </div>
+    `;
+
+  } catch (err) {
+    console.error('Detay yükleme hatası:', err);
   }
 }
 
