@@ -1,96 +1,206 @@
+/* style.css */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+    --kenar-cubugu-bg: #f5e6ca; 
+    --ana-bg: #eebc4d;   
+    --kart-bg: #fdf6e3;    
+    --buton-mavi: #3abef9;   
+    --yazi-koyu: #333;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    background-color: var(--ana-bg); /* Arka plan rengini genel yaptık */
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Sayfa Yapısı */
+.page-container {
+    min-height: 100vh;
+    background-color: white; /* İçerik alanı beyaz olsun */
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* SOL KENAR ÇUBUĞU */
+.KenarCubugu {
+    background-color: var(--kenar-cubugu-bg);
+    padding: 20px;
+    min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #f7df1eaa);
+.Logo {
+    width: 120px; height: 120px;
+    background-color: white;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    margin: 0 auto 40px auto;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.card {
-  padding: 2em;
+.Logo i { font-size: 50px; color: var(--ana-bg); }
+
+.KategoriKutusu {
+    background-color: #fdf6e3;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-.read-the-docs {
-  color: #888;
+.KategoriBaslik {
+    font-weight: 800;
+    text-decoration: underline;
+    margin-bottom: 15px;
+    color: #4a4a4a;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.KategoriListesi {
+    list-style: none; /* Noktaları kaldır */
+    padding: 0;
+    margin: 0;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.KategoriOgesi {
+    font-weight: 700;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+    color: #4a4a4a;
+}
+
+.KategoriOgesi:hover {
+    background-color: rgba(238, 188, 77, 0.2);
+    color: var(--ana-bg);
+}
+
+.KategoriOgesi.Aktif {
+    background-color: var(--ana-bg);
+    color: white;
+}
+
+/* SAĞ ANA İÇERİK */
+.AnaIcerik {
+    background-color: var(--ana-bg);
+    padding: 30px 60px;
+    min-height: 100vh;
+}
+
+/* Üst Bar */
+.AramaCubugu {
+    background-color: var(--kenar-cubugu-bg);
+    border: none;
+    border-radius: 20px 0 0 20px;
+    padding: 10px 20px;
+    height: 45px;
+}
+
+.AramaButonu {
+    background-color: #fff;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    color: #aaa;
+    padding: 0 20px;
+    font-weight: bold;
+    height: 45px;
+}
+
+.EtkinlikOlustur {
+    background-color: var(--buton-mavi);
+    color: white;
+    border-radius: 10px;
+    padding: 0 30px;
+    font-weight: bold;
+    border: none;
+    height: 45px;
+}
+
+.ProfilKutusu {
+    width: 60px; height: 60px;
+    background-color: var(--kenar-cubugu-bg);
+    border-radius: 15px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.ProfilKutusu img { width: 100%; height: 100%; object-fit: cover; }
+
+/* KART TASARIMI */
+.EtkinlikKartlari {
+    background-color: var(--kart-bg);
+    border-radius: 15px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    height: 90px;
+    transition: all 0.3s ease;
+}
+
+.KullaniciProfil {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-left: 10px;
+}
+
+.EtkinlikBaslik {
+    flex-grow: 1;
+    padding-left: 20px;
+    font-weight: bold;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.KartAksiyonlari {
+    display: flex; align-items: center; gap: 10px;
+    margin-right: 60px; /* Kontenjan çubuğu için boşluk */
+}
+
+.KatilButonu {
+    background-color: var(--buton-mavi);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 30px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.KatilButonu:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.ok-ikonu {
+    color: #daa520;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Sağdaki Kontenjan Çubuğu */
+div.Kontenjan {
+    background-color: var(--buton-mavi);
+    color: white;
+    height: 90px;
+    width: 50px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    position: absolute;
+    right: 0; top: 0;
+}
+
+div.Kontenjan > div.Kontenjan {
+    width: 80%;
+    height: 2px;
+    background-color: rgba(255,255,255,0.5);
+    margin: 2px 0;
+    border-radius: 0; 
+    position: static; 
 }
