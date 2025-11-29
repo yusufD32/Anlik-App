@@ -31,7 +31,7 @@ body {
     background-color: white;
     border-radius: 50%;
     border: 5px solid #fff;
-    margin: 0 auto 40px auto;
+    margin: 0 40px 40px auto;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
@@ -94,7 +94,7 @@ body {
 }
 
 .AramaButonu {
-    background-color: #fff;
+    background-color: #4e4b4b;
     border: none;
     border-radius: 0 20px 20px 0;
     color: #aaa;
@@ -111,12 +111,13 @@ body {
     font-weight: bold;
     border: none;
     height: 45px;
+    margin-left: 100px;
 }
 
 .ProfilKutusu {
-    width: 60px; height: 60px;
+    width: 180px; height: 180px;
     background-color: var(--kenar-cubugu-bg);
-    border-radius: 15px;
+    border-radius: 150px;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     cursor: pointer;
