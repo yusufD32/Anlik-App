@@ -37,6 +37,10 @@ body {
 }
 
 .Logo i { font-size: 50px; color: var(--ana-bg); }
+.Logo:hover {
+    width: 130px; height: 130px;
+    transition: 0.8s;
+}
 
 .KategoriKutusu {
     background-color: #fdf6e3;
