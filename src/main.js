@@ -171,10 +171,7 @@ async function loadEvents() {
     <div class="EtkinlikBaslik" style="padding-bottom: 10px;">
         <div class="d-flex justify-content-between align-items-center pe-5">
             <span style="font-size: 1.2rem;">${data.baslik}</span>
-            <span class="badge bg-light text-dark border">
-                <i class="far fa-calendar-alt text-warning me-1"></i> ${data.tarih || ''} 
-                <i class="far fa-clock text-warning ms-2 me-1"></i> ${data.saat || ''}
-            </span>
+            
         </div>
 
         <div class="mt-2 mb-2">
@@ -182,11 +179,14 @@ async function loadEvents() {
                 <i class="fas fa-map-marker-alt text-danger me-1"></i> ${data.konum}
             </small>
         </div>
+        <span class="badge bg-light text-dark border">
+                <i class="far fa-calendar-alt text-warning me-1"></i> ${data.tarih || ''} 
+                <i class="far fa-clock text-warning ms-2 me-1"></i> ${data.saat || ''}
+            </span>
 
-        <p class="text-muted small fst-italic mb-0 border-start border-3 border-warning ps-2">
-            "${data.aciklama || 'Açıklama yok.'}"
-        </p>
+        
     </div>
+    
 
     <div class="KartAksiyonlari" style="align-self: center;">
         <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
