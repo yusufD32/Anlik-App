@@ -45,7 +45,8 @@
         <div class="row h-100">
             
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
-                <div class="ProfilKutusu shadow-sm "  >
+                <div class="ProfilKutusu shadow-sm "
+                onclick="router('view-profile')"  >
                          <img src="https://i.pravatar.cc/150?img=11" alt="Profil">
                     </div>
                 
@@ -82,15 +83,52 @@
         </div>
     </div>
     <div id="view-profile" class="container-fluid page-container d-none">
-        <div class="row h-100">
-            <div class="col-md-9 KenarCubugu d-flex flex-column shadow-sm">
-                <div class="Logo" onclick="router('home')" style="cursor: pointer;"></div>
-
+    <div class="row h-100">
+        <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
+            <div class="Logo" onclick="router('view-home')" style="cursor: pointer;">
+                <i class="fa-solid fa-arrow-left text-warning"></i> </div>
+            
+            <div class="KategoriKutusu mt-4">
+                <h5 class="KategoriBaslik">MENÜ</h5>
+                <ul class="KategoriListesi">
+                    <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
+                    <li class="KategoriOgesi Aktif">PROFİLİM</li>
+                </ul>
+                <button id="logout-btn-2" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
+                    <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
+                </button>
             </div>
-
         </div>
 
+        <div class="col-md-9 AnaIcerik">
+            
+            <div class="card border-0 shadow-sm mb-4 rounded-4" style="background-color: #fdf6e3;">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="ProfilKutusu-Buyuk">
+                        <img id="profile-avatar" src="" alt="Avatar">
+                    </div>
+                    <div class="ms-4">
+                        <h2 class="fw-bold text-dark mb-1" id="profile-email">Yükleniyor...</h2>
+                        <div class="d-flex gap-3 mt-3">
+                            <span class="badge bg-white text-dark p-2 border shadow-sm">
+                                🔢 <span id="stat-created">0</span> Oluşturulan
+                            </span>
+                            <span class="badge bg-white text-dark p-2 border shadow-sm">
+                                🎟️ <span id="stat-joined">0</span> Katılım
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="fw-bold mb-3" style="color:#555;">Oluşturduğum Etkinlikler</h4>
+            <div id="list-created">Yükleniyor...</div>
+
+            <h4 class="fw-bold mb-3 mt-5" style="color:#555;">Katıldığım Etkinlikler</h4>
+            <div id="list-joined">Yükleniyor...</div>
+        </div>
     </div>
+</div>
 
     <div id="view-create" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
     <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 500px; background: #fff8e1;"> <div class="d-flex justify-content-between align-items-center mb-3">

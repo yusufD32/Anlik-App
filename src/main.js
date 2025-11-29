@@ -17,12 +17,75 @@ const eventsContainer = document.getElementById('events-list');
 // Router Sistemi
 const router = (viewId) => {
   // Bütün bölümleri gizle
-  [loginBolumu, homeBolumu, olusturmaBolumu].forEach(el => el && el.classList.add('d-none'));
+  [loginBolumu, homeBolumu, olusturmaBolumu, document.getElementById('view-profile')].forEach(el => el && el.classList.add('d-none'));
   
   // İstenileni aç
   const target = document.getElementById(viewId);
-  if (target) target.classList.remove('d-none');
+  if (target){ target.classList.remove('d-none');
+    if(viewId === 'view-profile') loadProfileData();
+
+  }
 };
+// --- PROFİL VERİLERİNİ YÜKLE ---
+async function loadProfileData() {
+    if(!currentUser) return;
+
+    // Üst bilgileri doldur
+    document.getElementById('profile-email').textContent = currentUser.email.split('@')[0];
+    document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${currentUser.email}&background=random&size=200`;
+
+    const listCreated = document.getElementById('list-created');
+    const listJoined = document.getElementById('list-joined');
+
+    listCreated.innerHTML = '<div class="spinner-border text-warning"></div>';
+    listJoined.innerHTML = '<div class="spinner-border text-warning"></div>';
+
+    try {
+        const snapshot = await getDocs(collection(db, "events"));
+
+        let createdHTML = '';
+        let joinedHTML = '';
+        let createdCount = 0;
+        let joinedCount = 0;
+
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+
+            // Basit Kart HTML'i (Profil için sadeleştirilmiş)
+            const miniCard = `
+            <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
+                <div class="EtkinlikBaslik ps-3">
+                    ${data.baslik} <br> 
+                    <small class="text-muted fw-normal">${data.tarih || ''} - ${data.saat || ''}</small>
+                </div>
+                <div class="Kontenjan" style="position:relative; height:80px; width:40px; border-radius:0 15px 15px 0;">
+                    <span>${data.katilimciSayisi}</span>
+                </div>
+            </div>`;
+
+            // A) Oluşturduklarım
+            if (data.olusturanEmail === currentUser.email) {
+                createdHTML += miniCard;
+                createdCount++;
+            }
+
+            // B) Katıldıklarım
+            if (data.katilimcilar && data.katilimcilar.includes(currentUser.uid)) {
+                joinedHTML += miniCard;
+                joinedCount++;
+            }
+        });
+
+        listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
+        listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
+
+        document.getElementById('stat-created').textContent = createdCount;
+        document.getElementById('stat-joined').textContent = joinedCount;
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 
 let currentUser = null;
 
