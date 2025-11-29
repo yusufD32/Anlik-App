@@ -103,16 +103,29 @@ async function loadEvents() {
   const html = `
 <div class="EtkinlikKartlari shadow-sm">
     
-    <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" 
-         alt="Kullanici" class="KullaniciProfil">
+    <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" class="KullaniciProfil">
     
-    <div class="EtkinlikBaslik">
-        ${data.baslik} 
-        <br>
-        <small style="font-weight:normal; font-size:0.8rem;">📍 ${data.konum}</small>
+    <div class="EtkinlikBaslik" style="padding-bottom: 10px;">
+        <div class="d-flex justify-content-between align-items-center pe-5">
+            <span style="font-size: 1.2rem;">${data.baslik}</span>
+            <span class="badge bg-light text-dark border">
+                <i class="far fa-calendar-alt text-warning me-1"></i> ${data.tarih || ''} 
+                <i class="far fa-clock text-warning ms-2 me-1"></i> ${data.saat || ''}
+            </span>
+        </div>
+
+        <div class="mt-2 mb-2">
+            <small style="font-weight:normal; font-size:0.9rem; color:#666;">
+                <i class="fas fa-map-marker-alt text-danger me-1"></i> ${data.konum}
+            </small>
+        </div>
+
+        <p class="text-muted small fst-italic mb-0 border-start border-3 border-warning ps-2">
+            "${data.aciklama || 'Açıklama yok.'}"
+        </p>
     </div>
 
-    <div class="KartAksiyonlari">
+    <div class="KartAksiyonlari" style="align-self: center;">
         <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
             ${userJoined ? 'Katıldın' : 'Katıl'}
         </button>
@@ -123,7 +136,8 @@ async function loadEvents() {
 
     <div class="Kontenjan">
         <span>${data.katilimciSayisi}</span>
-        <div class="Kontenjan"></div> <span>${data.kontenjan}</span>
+        <div class="Cizgi"></div>
+        <span>${data.kontenjan}</span>
     </div>
 </div>
 `;    eventsContainer.innerHTML += html;
@@ -247,35 +261,51 @@ if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-cre
 const cancelCreateBtn = document.getElementById('btn-cancel-create'); 
 if(cancelCreateBtn) cancelCreateBtn.addEventListener('click', () => router('view-home'));
 
+
+
 const saveBtn = document.getElementById('btn-save');
 if(saveBtn) {
-  saveBtn.addEventListener('click', async () => {
-      const baslik = document.getElementById('create-title').value;
-      const kontenjan = document.getElementById('create-quota').value;
-      const konum = document.getElementById('create-location').value;
+    saveBtn.addEventListener('click', async () => {
+        // 1. Verileri HTML'den al
+        const baslik = document.getElementById('create-title').value;
+        const kontenjan = document.getElementById('create-quota').value;
+        const konum = document.getElementById('create-location').value;
+        const tarih = document.getElementById('create-date').value;  // YENİ
+        const saat = document.getElementById('create-time').value;    // YENİ
+        const aciklama = document.getElementById('create-desc').value;// YENİ
 
-      if(!baslik || !konum) return alert("Lütfen alanları doldurun");
+        // 2. Boş alan kontrolü
+        if(!baslik || !konum || !tarih || !saat) return alert("Lütfen gerekli alanları doldurun!");
 
-      try {
-          await addDoc(collection(db, "events"), {
-              baslik, konum, 
-              kontenjan: Number(kontenjan),
-              katilimciSayisi: 1,
-              katilimcilar: [currentUser.uid],
-              olusturanEmail: currentUser.email,
-              olusturulmaTarihi: new Date().toISOString()
-          });
-          
-          document.getElementById('create-title').value = "";
-          document.getElementById('create-location').value = "";
-          
-          router('view-home');
-          loadEvents(); // loadevents = verileri cek
-          
-      } catch (err) {
-          alert("Hata: " + err.message);
-      }
-  });
+        try {
+            // 3. Firebase'e Kaydet
+            await addDoc(collection(db, "events"), {
+                baslik, 
+                konum,
+                tarih,    // Veritabanına gidiyor
+                saat,     // Veritabanına gidiyor
+                aciklama, // Veritabanına gidiyor
+                kontenjan: Number(kontenjan),
+                katilimciSayisi: 1,
+                katilimcilar: [currentUser.uid],
+                olusturanEmail: currentUser.email,
+                olusturulmaTarihi: new Date().toISOString()
+            });
+            
+            // 4. Formu Temizle
+            document.getElementById('create-title').value = "";
+            document.getElementById('create-location').value = "";
+            document.getElementById('create-desc').value = "";
+            document.getElementById('create-date').value = "";
+            document.getElementById('create-time').value = "";
+            
+            // 5. Modalı kapat ve listeyi yenile
+            document.getElementById('view-create').classList.add('d-none');
+            loadEvents();
+            
+        } catch (err) {
+            alert("Hata: " + err.message);
+        }
+    });
 }
-
 window.router = router;

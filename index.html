@@ -93,32 +93,48 @@
     </div>
 
     <div id="view-create" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
-        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 450px; background: #fff8e1;">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold text-dark m-0">Yeni Etkinlik</h4>
-                <button id="btn-cancel-create" class="btn-close"></button>
-            </div>
-            
-            <div class="mb-3">
-                <label class="fw-bold small text-muted">Başlık</label>
-                <input type="text" id="create-title" class="form-control form-control-lg border-0" placeholder="Örn: Akşam Halı Saha">
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <label class="fw-bold small text-muted">Kontenjan</label>
-                    <input type="number" id="create-quota" class="form-control form-control-lg border-0" value="5">
-                </div>
-                <div class="col-6">
-                    <label class="fw-bold small text-muted">Konum</label>
-                    <input type="text" id="create-location" class="form-control form-control-lg border-0" placeholder="Örn: Kampüs">
-                </div>
-            </div>
-
-            <button id="btn-save" class="btn btn-primary w-100 text-white fw-bold py-3 rounded-pill shadow mt-2" style="background-color: #3abef9; border:none;">
-                Yayınla
-            </button>
+    <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 500px; background: #fff8e1;"> <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold text-dark m-0">Yeni Etkinlik</h4>
+            <button id="btn-cancel-create" class="btn-close"></button>
         </div>
+        
+        <div class="mb-3">
+            <label class="fw-bold small text-muted">Başlık</label>
+            <input type="text" id="create-title" class="form-control form-control-lg border-0 shadow-sm" placeholder="Örn: Akşam Halı Saha">
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6">
+                <label class="fw-bold small text-muted">Tarih</label>
+                <input type="date" id="create-date" class="form-control border-0 shadow-sm">
+            </div>
+            <div class="col-6">
+                <label class="fw-bold small text-muted">Saat</label>
+                <input type="time" id="create-time" class="form-control border-0 shadow-sm">
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6">
+                <label class="fw-bold small text-muted">Kontenjan</label>
+                <input type="number" id="create-quota" class="form-control border-0 shadow-sm" value="5">
+            </div>
+            <div class="col-6">
+                <label class="fw-bold small text-muted">Konum</label>
+                <input type="text" id="create-location" class="form-control border-0 shadow-sm" placeholder="Örn: Kampüs">
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="fw-bold small text-muted">Açıklama</label>
+            <textarea id="create-desc" class="form-control border-0 shadow-sm" rows="3" placeholder="Detayları buraya yaz... (Örn: Krampon getirmeyi unutmayın)"></textarea>
+        </div>
+
+        <button id="btn-save" class="btn btn-primary w-100 text-white fw-bold py-3 rounded-pill shadow mt-2" style="background-color: #3abef9; border:none;">
+            Yayınla ve Paylaş
+        </button>
+    </div>
+</div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
