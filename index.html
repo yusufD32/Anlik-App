@@ -1,18 +1,123 @@
 <!doctype html>
-<html lang="en">
-  <head>
+<html lang="tr">
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>anlik-app</title>
-  </head>
-  <body>
-    <div id="app"></div>
+    <title>Anlık</title>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="loading">
+        <div class="d-flex justify-content-center align-items-center vh-100 bg-white fixed-top" style="z-index:9999;">
+            <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;"></div>
+        </div>
+    </div>
+
+    <div id="view-login" class="d-flex justify-content-center align-items-center vh-100 bg-white">
+        <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
+            <div class="text-center mb-4">
+                <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="fas fa-bolt fa-3x"></i>
+                </div>
+                <h3 class="fw-bold text-dark">Giriş Yap</h3>
+                <p class="text-muted">Anlık'a hoş geldin!</p>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input type="email" id="email-input" class="form-control" placeholder="name@example.com">
+                <label>Email Adresi</label>
+            </div>
+            <div class="form-floating mb-4">
+                <input type="password" id="password-input" class="form-control" placeholder="Password">
+                <label>Şifre</label>
+            </div>
+
+            <button id="login-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Giriş Yap</button>
+            <div id="login-error" class="text-danger mt-3 text-center small fw-bold"></div>
+        </div>
+    </div>
+
+    <div id="view-home" class="container-fluid page-container d-none">
+        <div class="row h-100">
+            
+            <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
+                <div class="Logo">
+                    <i class="fa-solid fa-person-running"></i>
+                </div>
+                
+                <div class="KategoriKutusu mt-4">
+                    <h5 class="KategoriBaslik">KATEGORİLER</h5>
+                    <ul class="KategoriListesi">
+                        <li class="KategoriOgesi Aktif" data-filtre="Tumu">TÜMÜ</li>
+                        <li class="KategoriOgesi" data-filtre="Spor">SPOR</li>
+                        <li class="KategoriOgesi" data-filtre="KafeSohbet">KAFE SOHBET</li>
+                        <li class="KategoriOgesi" data-filtre="Masa">MASA OYUNLARI</li>
+                        <li class="KategoriOgesi" data-filtre="Konusma">KONUŞMA</li>
+                    </ul>
+
+                    <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
+                        <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-9 AnaIcerik">
+                
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <div class="d-flex align-items-center flex-grow-1 me-4" style="max-width: 500px">
+                        <input type="text" class="form-control AramaCubugu" placeholder="ETKİNLİK ARA...">
+                        <button class="AramaButonu">ARA</button>
+                    </div>
+                    
+                    <button id="btn-show-create" class="EtkinlikOlustur me-3 shadow-sm hover-effect">
+                        <i class="fas fa-plus me-2"></i> Etkinlik Oluştur
+                    </button>
+                    
+                    <div class="ProfilKutusu shadow-sm">
+                         <img src="https://i.pravatar.cc/150?img=11" alt="Profil">
+                    </div>
+                </div>
+
+                <div id="events-list">
+                    </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="view-create" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
+        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 450px; background: #fff8e1;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold text-dark m-0">Yeni Etkinlik</h4>
+                <button id="btn-cancel-create" class="btn-close"></button>
+            </div>
+            
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Başlık</label>
+                <input type="text" id="create-title" class="form-control form-control-lg border-0" placeholder="Örn: Akşam Halı Saha">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Kontenjan</label>
+                    <input type="number" id="create-quota" class="form-control form-control-lg border-0" value="5">
+                </div>
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Konum</label>
+                    <input type="text" id="create-location" class="form-control form-control-lg border-0" placeholder="Örn: Kampüs">
+                </div>
+            </div>
+
+            <button id="btn-save" class="btn btn-primary w-100 text-white fw-bold py-3 rounded-pill shadow mt-2" style="background-color: #3abef9; border:none;">
+                Yayınla
+            </button>
+        </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
-    <div class="container mt-5">
-    <button class="btn btn-primary btn-lg shadow">
-        Bootstrap Çalışıyor! 🚀
-    </button>
-</div>
-  </body>
+</body>
 </html>

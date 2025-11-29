@@ -3,7 +3,7 @@ import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
-// HATA 1: 'onAuthStateChaged' yanlış yazılmıştı (n harfi eksikti)
+
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, getDocs, addDoc, doc, arrayUnion, increment, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
@@ -29,7 +29,7 @@ let currentUser = null;
 // Firebase Oturum Dinleyici
 onAuthStateChanged(auth, (user) => {
   const loadingElement = document.getElementById('loading');
-  // HATA 2: 'loadingElemnet' yazım hatası vardı
+  
   if (loadingElement) loadingElement.classList.add('d-none');
 
   if(user) {
@@ -89,7 +89,7 @@ async function loadEvents() {
     }
 
     snapshot.forEach((docSnap => {
-      // HATA 3: Değişken isimleri karışmıştı.
+     
       const data = docSnap.data(); // eventData yerine data dedim ki aşağıdaki HTML ile uyuşsun
       const id = docSnap.id;       // eventId yerine id dedim
       
@@ -98,32 +98,33 @@ async function loadEvents() {
 
       const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid)
 
-      const html = `
-          <div class="col-md-6 mb-3">
-              <div class="card border-0 shadow-sm" style="background-color: #fff8e1;">
-                  <div class="card-body">
-                      <div class="d-flex justify-content-between align-items-start">
-                          <div>
-                              <h5 class="card-title fw-bold mb-1">${data.baslik}</h5>
-                              <small class="text-muted">📍 ${data.konum}</small>
-                          </div>
-                          <span class="badge bg-primary rounded-pill">${data.katilimciSayisi}/${data.kontenjan}</span>
-                      </div>
-                      
-                      <div class="progress mt-3 mb-3" style="height: 6px;">
-                          <div class="progress-bar bg-warning" role="progressbar" style="width: ${doluluk}%"></div>
-                      </div>
+      // --- loadEvents İÇİNDEKİ YENİ KART HTML ŞABLONU ---
 
-                      <div class="d-grid">
-                          <button class="btn btn-${userJoined ? 'secondary' : 'outline-dark'} btn-sm fw-bold btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
-                              ${userJoined ? 'Katıldın' : 'Katıl'}
-                          </button>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          `;
-          eventsContainer.innerHTML += html;
+const html = `
+<div class="EtkinlikKartlari shadow-sm">
+    
+    <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" 
+         alt="Kullanici" class="KullaniciProfil">
+    
+    <div class="EtkinlikBaslik">
+        ${data.baslik} 
+        <br>
+        <small style="font-weight:normal; font-size:0.8rem;">📍 ${data.konum}</small>
+    </div>
+
+    <div class="KartAksiyonlari">
+        <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
+            ${userJoined ? 'Katıldın' : 'Katıl'}
+        </button>
+        <i class="fa-solid fa-chevron-down ok-ikonu"></i>
+    </div>
+
+    <div class="Kontenjan">
+        <span>${data.katilimciSayisi}</span>
+        <div class="Kontenjan"></div> <span>${data.kontenjan}</span>
+    </div>
+</div>
+`;    eventsContainer.innerHTML += html;
       }));
 
       
