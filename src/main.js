@@ -151,19 +151,24 @@ async function loadEvents() {
       return;
     }
 
-    snapshot.forEach((docSnap => {
-     
-      const data = docSnap.data(); // eventData yerine data dedim ki aşağıdaki HTML ile uyuşsun
-      const id = docSnap.id;       // eventId yerine id dedim
-      
-      
-      const doluluk = (data.katilimciSayisi / data.kontenjan) * 100;
+    // Tüm etkinlikleri array'e koy
+    const events = [];
+    snapshot.forEach(docSnap => {
+      events.push({ id: docSnap.id, data: docSnap.data() });
+    });
 
+    // En yenileri önce: oluşturulma zamanına göre ters sırala
+    events.sort((a, b) => {
+      const timeA = a.data.olusturulmaTarihi || '';
+      const timeB = b.data.olusturulmaTarihi || '';
+      return timeB.localeCompare(timeA);
+    });
+
+    // Sıralanmış etkinlikleri HTML'e dönüştür
+    events.forEach(({ id, data }) => {
       const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid)
 
-      // --- loadEvents İÇİNDEKİ YENİ KART HTML ŞABLONU ---
-
-  const html = `
+      const html = `
 <div class="EtkinlikKartlari shadow-sm">
     
     <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" class="KullaniciProfil">
@@ -195,16 +200,15 @@ async function loadEvents() {
       <i class="fa-solid fa-chevron-down ok-ikonu" data-id="${id}" style="cursor:pointer"></i>
     </div>
 
-    <!-- details will be inserted below this card when requested -->
-
     <div class="Kontenjan">
         <span>${data.katilimciSayisi}</span>
         <div class="Cizgi"></div>
         <span>${data.kontenjan}</span>
     </div>
 </div>
-`;    eventsContainer.innerHTML += html;
-      }));
+`;
+      eventsContainer.innerHTML += html;
+    });
 
       
       document.querySelectorAll('.btn-katil').forEach(btn => {
