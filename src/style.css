@@ -208,6 +208,36 @@ div.Kontenjan > div.Kontenjan {
     border-radius: 0; 
     position: static; 
 }
-#logout-btn{
-    margin-top: 550px;
+
+/* Inline detay kutusu: kartla bütünleşik, ama alt karttan ayrık */
+.EtkinlikDetayInline {
+    background-color: var(--kart-bg);
+    color: #333;
+    border-radius: 15px;
+    padding: 12px 14px;
+    margin-top: -15px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    height: auto;
+    width: calc(100% - 45px);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    /* background: #ffffff;
+    border-radius: 0 0 15px 15px;
+    padding: 12px 14px;
+    margin-top: -15px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    font-size: 0.95rem;
+    color: #333; */
+}
+
+.EtkinlikDetayInline .detay-aciklama {
+    color: #555;
+    margin-top: 8px;
+    line-height: 1.3;
 }
