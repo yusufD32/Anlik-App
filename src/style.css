@@ -115,11 +115,11 @@ body {
     height: 45px;
     margin-left: 100px;
 }
-
+/* Header'daki Küçük Profil Kutusu */
 .ProfilKutusu {
-    width: 180px; height: 180px;
+    width: 60px; height: 60px; /* 180px'den 60px'e düşürdük */
     background-color: var(--kenar-cubugu-bg);
-    border-radius: 150px;
+    border-radius: 50%; /* Tam yuvarlak */
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     cursor: pointer;
@@ -128,6 +128,15 @@ body {
 
 .ProfilKutusu img { width: 100%; height: 100%; object-fit: cover; }
 
+/* Profil Sayfasındaki BÜYÜK Profil Resmi İçin Yeni Class */
+.ProfilKutusu-Buyuk {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 5px solid var(--ana-bg);
+    margin-bottom: 20px;
+}
+.ProfilKutusu-Buyuk img { width: 100%; height: 100%; object-fit: cover; }
 /* KART TASARIMI */
 .EtkinlikKartlari {
     background-color: var(--kart-bg);
