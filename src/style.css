@@ -204,3 +204,22 @@ div.Kontenjan > div.Kontenjan {
     border-radius: 0; 
     position: static; 
 }
+/* style.css en altina ekle */
+
+/* Input ve Textarea ortak stili */
+#view-create input, #view-create textarea {
+    border-radius: 10px;
+    background-color: white;
+    font-weight: 600;
+    color: #555;
+}
+
+#view-create input:focus, #view-create textarea:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(58, 190, 249, 0.2) !important; /* Mavi odak ışığı */
+}
+
+/* Textarea boyutlandırma ikonunu gizle (isteğe bağlı) */
+textarea {
+    resize: none;
+}
