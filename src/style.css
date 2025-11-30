@@ -1,25 +1,25 @@
-/* style.css */
+
 :root {
-    --kenar-cubugu-bg: #f5e6ca; 
-    --ana-bg: #eebc4d;   
-    --kart-bg: #fdf6e3;    
-    --buton-mavi: #3abef9;   
-    --yazi-koyu: #333;
+   --kenar-cubugu-bg: #E9F5FF;  
+    --ana-bg: #c8e2f6;            
+    --kart-bg: #FFFFFF;           
+    --buton-mavi: #ed7337;      
+    --yazi-koyu: #1E1E1E; 
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-x: hidden;
-    background-color: var(--ana-bg); /* Arka plan rengini genel yaptık */
+    background-color: var(--ana-bg); 
 }
 
-/* Sayfa Yapısı */
+
 .page-container {
     min-height: 100vh;
-    background-color: white; /* İçerik alanı beyaz olsun */
+    background-color: white; 
 }
 
-/* SOL KENAR ÇUBUĞU */
+
 .KenarCubugu {
     background-color: var(--kenar-cubugu-bg);
     padding: 20px;
@@ -58,7 +58,7 @@ body {
 }
 
 .KategoriListesi {
-    list-style: none; /* Noktaları kaldır */
+    list-style: none; 
     padding: 0;
     margin: 0;
 }
@@ -82,14 +82,14 @@ body {
     color: white;
 }
 
-/* SAĞ ANA İÇERİK */
+
 .AnaIcerik {
     background-color: var(--ana-bg);
     padding: 30px 60px;
     min-height: 100vh;
 }
 
-/* Üst Bar */
+
 .AramaCubugu {
     background-color: var(--kenar-cubugu-bg);
     border: none;
@@ -119,7 +119,7 @@ body {
     height: 45px;
     margin-left: 100px;
 }
-/* Header'daki Küçük Profil Kutusu */
+
 .ProfilKutusu {
     width: 160px; height: 160px; 
     background-color: var(--kenar-cubugu-bg);
@@ -132,7 +132,7 @@ body {
 
 .ProfilKutusu img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Profil Sayfasındaki BÜYÜK Profil Resmi İçin Yeni Class */
+
 .ProfilKutusu-Buyuk {
     width: 150px; height: 150px;
     border-radius: 50%;
@@ -141,7 +141,7 @@ body {
     margin-bottom: 20px;
 }
 .ProfilKutusu-Buyuk img { width: 100%; height: 100%; object-fit: cover; }
-/* KART TASARIMI */
+
 .EtkinlikKartlari {
     background-color: var(--kart-bg);
     border-radius: 15px;
@@ -181,7 +181,7 @@ body {
     border-radius: 20px;
     padding: 4px 30px;
     font-weight: bold;
-    transition: background 0.2s;
+    
 }
 
 .KatilButonu:disabled {
@@ -195,7 +195,7 @@ body {
     cursor: pointer;
 }
 
-/* Sağdaki Kontenjan Çubuğu */
+
 div.Kontenjan {
     background-color: var(--buton-mavi);
     color: white;
@@ -222,7 +222,7 @@ div.Kontenjan > div.Kontenjan {
     position: static; 
 }
 
-/* Inline detay kutusu: kartla bütünleşik, ama alt karttan ayrık */
+
 .EtkinlikDetayInline {
     background-color: var(--kart-bg);
     color: #333;
@@ -258,5 +258,5 @@ div.Kontenjan > div.Kontenjan {
     display: none !important;
 }
 .sticky{
-    position:sticky;
+    position: sticky;
 }
