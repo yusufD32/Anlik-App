@@ -58,9 +58,7 @@ async function loadProfileData() {
                     ${data.baslik} <br> 
                     <small class="text-muted fw-normal">${data.tarih || ''} - ${data.saat || ''}</small>
                 </div>
-                <div class="Kontenjan" style="position:relative; height:80px; width:40px; border-radius:0 15px 15px 0;">
-                    <span>${data.katilimciSayisi}</span>
-                </div>
+                
             </div>`;
 
             // A) Oluşturduklarım
