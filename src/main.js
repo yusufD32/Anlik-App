@@ -4,8 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
 
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc } from "firebase/firestore";
+// 1. IMPORTLARI GÜNCELLEDİM (updateProfile ve setDoc eklendi)
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
 
 // HTML Elementlerini Seçme
@@ -26,14 +27,49 @@ const router = (viewId) => {
 
   }
 };
-// --- PROFİL VERİLERİNİ YÜKLE ---
+
+// --- 2. PROFİL VERİLERİNİ YÜKLEME FONKSİYONUNU GÜNCELLEDİM ---
 async function loadProfileData() {
     if(!currentUser) return;
 
-    // Üst bilgileri doldur
-    document.getElementById('profile-email').textContent = currentUser.email.split('@')[0];
-    document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${currentUser.email}&background=random&size=200`;
+    // A) Auth Bilgilerini (Email ve İsim) Doldur
+    document.getElementById('profile-email').textContent = currentUser.email;
+    
+    // Avatarı isme göre oluştur, isim yoksa emaile göre
+    const displayName = currentUser.displayName || currentUser.email;
+    document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
 
+    // İsmi yazdır (Varsa ismi, yoksa "İsim girilmemiş" yazsın)
+    const fullNameEl = document.getElementById('profile-fullname');
+    if(currentUser.displayName) {
+        fullNameEl.textContent = currentUser.displayName;
+    } else {
+        fullNameEl.textContent = "İsim girilmemiş";
+    }
+
+    // B) Firestore'dan Telefon Numarasını Çek
+    const phoneEl = document.getElementById('profile-phone');
+    phoneEl.textContent = "Yükleniyor..."; // Bekleme yazısı
+
+    try {
+        // 'users' koleksiyonundan kullanıcının dökümanını bul
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userDocRef);
+        
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            // Telefon varsa yaz, yoksa uyarı ver
+            phoneEl.textContent = userData.phone || "Telefon eklenmemiş";
+        } else {
+            phoneEl.textContent = "Telefon eklenmemiş";
+        }
+    } catch (e) {
+        console.log("Profil detay hatası:", e);
+        phoneEl.textContent = "-";
+    }
+
+
+    // --- Buradan aşağısı senin eski istatistik kodların (AYNI KALDI) ---
     const listCreated = document.getElementById('list-created');
     const listJoined = document.getElementById('list-joined');
 
@@ -51,7 +87,7 @@ async function loadProfileData() {
         snapshot.forEach(docSnap => {
             const data = docSnap.data();
 
-            // Basit Kart HTML'i (Profil için sadeleştirilmiş)
+            // Basit Kart HTML'i
             const miniCard = `
             <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
                 <div class="EtkinlikBaslik ps-3">
@@ -133,6 +169,11 @@ if(loginBtn) {
 const logoutBtn = document.getElementById('logout-btn');
 if(logoutBtn) {
   logoutBtn.addEventListener('click', () => signOut(auth));
+}
+// Çıkış Yap Butonu 2 (Profildeki)
+const logoutBtn2 = document.getElementById('logout-btn-2');
+if(logoutBtn2) {
+  logoutBtn2.addEventListener('click', () => signOut(auth));
 }
 
 // Verileri Çekme Fonksiyonu
@@ -350,9 +391,9 @@ if(saveBtn) {
         const baslik = document.getElementById('create-title').value;
         const kontenjan = document.getElementById('create-quota').value;
         const konum = document.getElementById('create-location').value;
-        const tarih = document.getElementById('create-date').value;  // YENİ
-        const saat = document.getElementById('create-time').value;    // YENİ
-        const aciklama = document.getElementById('create-desc').value;// YENİ
+        const tarih = document.getElementById('create-date').value; 
+        const saat = document.getElementById('create-time').value; 
+        const aciklama = document.getElementById('create-desc').value;
 
         // 2. Boş alan kontrolü
         if(!baslik || !konum || !tarih || !saat) return alert("Lütfen gerekli alanları doldurun!");
@@ -362,9 +403,9 @@ if(saveBtn) {
             await addDoc(collection(db, "events"), {
                 baslik, 
                 konum,
-                tarih,    // Veritabanına gidiyor
-                saat,     // Veritabanına gidiyor
-                aciklama, // Veritabanına gidiyor
+                tarih,    
+                saat,     
+                aciklama, 
                 kontenjan: Number(kontenjan),
                 katilimciSayisi: 1,
                 katilimcilar: [currentUser.uid],
@@ -388,4 +429,90 @@ if(saveBtn) {
         }
     });
 }
+
+
+// --- 3. YENİ EKLENEN KISIM: PROFİL DÜZENLEME İŞLEMLERİ ---
+
+// A) Modalı Açma
+const btnEditOpen = document.getElementById('btn-edit-profile-open');
+const modalEditProfile = document.getElementById('view-edit-profile');
+
+if(btnEditOpen) {
+    btnEditOpen.addEventListener('click', async () => {
+        if(!currentUser) return;
+        
+        // Modalı göster
+        modalEditProfile.classList.remove('d-none');
+        
+        // Mevcut ismi inputa yaz
+        document.getElementById('edit-fullname').value = currentUser.displayName || "";
+        
+        // Veritabanından telefonu çekip inputa yaz
+        try {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userDocRef);
+            if(userSnap.exists()) {
+                document.getElementById('edit-phone').value = userSnap.data().phone || "";
+            }
+        } catch(e) {
+            console.log("Telefon çekme hatası", e);
+        }
+    });
+}
+
+// B) Modalı Kapatma
+const btnEditClose = document.getElementById('btn-close-edit-profile');
+if(btnEditClose) {
+    btnEditClose.addEventListener('click', () => {
+        modalEditProfile.classList.add('d-none');
+    });
+}
+
+// C) Kaydetme İşlemi
+const btnSaveProfile = document.getElementById('btn-save-profile');
+if(btnSaveProfile) {
+    btnSaveProfile.addEventListener('click', async () => {
+        const newName = document.getElementById('edit-fullname').value;
+        const newPhone = document.getElementById('edit-phone').value;
+        
+        // Butonu "Kaydediliyor..." yap
+        const originalText = btnSaveProfile.textContent;
+        btnSaveProfile.textContent = "Kaydediliyor...";
+        btnSaveProfile.disabled = true;
+
+        try {
+            // 1. Firebase Auth Profilini Güncelle (İsim için)
+            if(currentUser.displayName !== newName) {
+                await updateProfile(currentUser, {
+                    displayName: newName
+                });
+            }
+
+            // 2. Firestore 'users' koleksiyonuna telefon ve ismi kaydet
+            // setDoc: Varsa günceller, yoksa oluşturur (merge:true sayesinde)
+            await setDoc(doc(db, "users", currentUser.uid), {
+                displayName: newName,
+                phone: newPhone,
+                email: currentUser.email
+            }, { merge: true });
+
+            // Başarılı
+            
+            modalEditProfile.classList.add('d-none');
+            
+            // Profil sayfasını yenile (ekrandaki veriler güncellensin)
+            loadProfileData();
+
+        } catch (error) {
+            console.error(error);
+            alert("Hata oluştu: " + error.message);
+        } finally {
+            // Butonu eski haline getir
+            btnSaveProfile.textContent = originalText;
+            btnSaveProfile.disabled = false;
+        }
+    });
+}
+
+
 window.router = router;
