@@ -98,14 +98,13 @@
         <div class="row h-100">
             
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
-                <div class="ProfilKutusu shadow-sm "  >
+                <div class="ProfilKutusu shadow-sm">
                           <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')">
                     </div>
                     <div class="text-center mt-3 mb-2">
-    <small class="text-muted">Hoşgeldiniz,</small>
-    <h5 id="sidebar-username" class="fw-bold text-dark text-truncate px-2">Yükleniyor...</h5>
-</div>
-                
+                        <small class="text-muted">Hoşgeldiniz,</small>
+                        <h5 id="sidebar-username" class="fw-bold text-dark text-truncate px-2">Yükleniyor...</h5>
+                    </div>
                 
                 <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill" >
                         <i class="fas fa-sign-out-alt me-2" ></i> Çıkış Yap
@@ -161,7 +160,7 @@
                 <div class="KategoriKutusu mt-4">
                     <h5 class="KategoriBaslik">MENÜ</h5>
                     <ul class="KategoriListesi">
-                        <li class="KategoriOgesi" onclick="router('view-home')" >ANA SAYFA</li>
+                        <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
                         <li class="KategoriOgesi Aktif">PROFİLİM</li>
                     </ul>
                     <button id="logout-btn-2" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
@@ -175,10 +174,19 @@
                 <div class="card border-0 shadow-sm mb-4 rounded-4" style="background-color: #fdf6e3;">
                     <div class="card-body p-4 d-flex align-items-center">
                         
-                        <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid #fff;">
-                            <img id="profile-avatar" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
+                        <div class="position-relative d-inline-block" style="width: 120px; height: 120px;">
+                            <img id="profile-avatar" src="" alt="Avatar" 
+                                 class="rounded-circle border border-4 border-white shadow-sm"
+                                 style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;">
+                            
+                            <div class="position-absolute bottom-0 end-0 bg-warning text-white rounded-circle d-flex justify-content-center align-items-center shadow-sm"
+                                 style="width: 35px; height: 35px; cursor: pointer; border: 2px solid white;"
+                                 onclick="document.getElementById('file-upload').click()">
+                                <i class="fas fa-camera small"></i>
+                            </div>
 
+                            <input type="file" id="file-upload" accept="image/*" class="d-none">
+                        </div>
                         <div class="ms-4">
                             <h2 class="fw-bold text-dark mb-0" id="profile-name">Yükleniyor...</h2>
                             <p class="text-muted mb-1" id="profile-username">@...</p>

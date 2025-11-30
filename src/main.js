@@ -3,9 +3,11 @@ import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
+// Storage importları eklendi
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "./firebase.js";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; 
+import { auth, db, storage } from "./firebase.js";
 
 // HTML Elementlerini Seçme
 const loginBolumu = document.getElementById('view-login');
@@ -14,11 +16,10 @@ const olusturmaBolumu = document.getElementById('view-create');
 const eventsContainer = document.getElementById('events-list');
 const registerBolumu = document.getElementById('view-register');
 const profilBolumu = document.getElementById('view-profile');
-const editProfileModal = document.getElementById('view-edit-profile'); // Yeni eklenen modal
+const editProfileModal = document.getElementById('view-edit-profile');
 
 // Router Sistemi
 const router = (viewId) => {
-  // Tüm sayfaları gizle
   [loginBolumu, homeBolumu, olusturmaBolumu, registerBolumu, profilBolumu, editProfileModal].forEach(el => el && el.classList.add('d-none'));
   
   const target = document.getElementById(viewId);
@@ -28,25 +29,28 @@ const router = (viewId) => {
   }
 };
 
-// --- PROFİL VERİLERİNİ YÜKLE (TEK VE TEMİZ FONKSİYON) ---
+// --- PROFİL VERİLERİNİ YÜKLE ---
 async function loadProfileData() {
     if(!currentUser) return;
 
-    // Elementleri tanımla
     const nameEl = document.getElementById('profile-name');
     const usernameEl = document.getElementById('profile-username');
     const emailEl = document.getElementById('profile-email');
     const phoneEl = document.getElementById('profile-phone');
     const avatarEl = document.getElementById('profile-avatar');
     
-    // Varsayılan değerler
     emailEl.textContent = currentUser.email;
     let displayName = currentUser.displayName || currentUser.email.split('@')[0];
     
-    // Avatarı yükle
-    avatarEl.src = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
+    // Varsayılan Avatar (UI Avatars)
+    let photoURL = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
 
-    // Firestore'dan detaylı verileri çek
+    // Auth profilinde fotoğraf varsa onu kullan
+    if(currentUser.photoURL) {
+        photoURL = currentUser.photoURL;
+    }
+
+    // Firestore'dan verileri çek
     try {
         const userDocRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userDocRef);
@@ -54,22 +58,24 @@ async function loadProfileData() {
         if (userSnap.exists()) {
             const userData = userSnap.data();
             
-            // İsim (Veritabanı > Auth > Varsayılan)
             const finalName = userData.adSoyad || userData.displayName || displayName;
             nameEl.textContent = finalName;
-            
-            // Kullanıcı adı
             usernameEl.textContent = userData.kullaniciAdi ? `@${userData.kullaniciAdi}` : `@${currentUser.email.split('@')[0]}`;
             
-            // Telefon (Varsa göster, yoksa uyarı)
             const phone = userData.telefon || userData.phone;
             phoneEl.innerHTML = phone ? `<i class="fas fa-phone-alt me-1"></i> ${phone}` : '<i class="fas fa-phone-slash me-1"></i> Telefon eklenmemiş';
 
-            // Avatarı güncel isme göre yenile
-            avatarEl.src = `https://ui-avatars.com/api/?name=${finalName}&background=random&size=200`;
+            // Veritabanında özel fotoğraf linki varsa onu kullan (En öncelikli)
+            if(userData.photoURL) {
+                photoURL = userData.photoURL;
+            } else {
+                // Yoksa ve Auth'da da yoksa isme göre avatar oluştur
+                if(!currentUser.photoURL) {
+                     photoURL = `https://ui-avatars.com/api/?name=${finalName}&background=random&size=200`;
+                }
+            }
 
         } else {
-            // Veritabanında yoksa sadece Auth bilgisini kullan
             nameEl.textContent = displayName;
             usernameEl.textContent = '@' + currentUser.email.split('@')[0];
             phoneEl.textContent = "Telefon bilgisi yok";
@@ -78,16 +84,17 @@ async function loadProfileData() {
         console.log("Profil verisi çekme hatası:", e);
     }
 
-    // İstatistikler ve Etkinlik Listeleri
+    // Avatarı ata
+    avatarEl.src = photoURL;
+
+    // --- İstatistikler ve Etkinlikler ---
     const listCreated = document.getElementById('list-created');
     const listJoined = document.getElementById('list-joined');
-
     listCreated.innerHTML = '<div class="spinner-border text-warning"></div>';
     listJoined.innerHTML = '<div class="spinner-border text-warning"></div>';
 
     try {
         const eventsSnap = await getDocs(collection(db, "events"));
-        
         let createdHTML = '';
         let joinedHTML = '';
         let createdCount = 0;
@@ -95,7 +102,6 @@ async function loadProfileData() {
 
         eventsSnap.forEach(docSnap => {
             const data = docSnap.data();
-
             const miniCard = `
             <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
                 <div class="EtkinlikBaslik ps-3">
@@ -108,7 +114,6 @@ async function loadProfileData() {
                 createdHTML += miniCard;
                 createdCount++;
             }
-
             if (data.katilimcilar && data.katilimcilar.includes(currentUser.uid)) {
                 joinedHTML += miniCard;
                 joinedCount++;
@@ -117,7 +122,6 @@ async function loadProfileData() {
 
         listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
         listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
-
         document.getElementById('stat-created').textContent = createdCount;
         document.getElementById('stat-joined').textContent = joinedCount;
       
@@ -127,6 +131,54 @@ async function loadProfileData() {
         listJoined.innerHTML = '<div class="text-danger">Hata oluştu.</div>';
     }
 }
+
+// --- FOTOĞRAF YÜKLEME İŞLEMİ (YENİ) ---
+const fileInput = document.getElementById('file-upload');
+const avatarImage = document.getElementById('profile-avatar');
+
+if(fileInput) {
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if(!file || !currentUser) return;
+
+        // Görsel olarak hemen yükleniyor efekti verelim (Opacity düşür)
+        avatarImage.style.opacity = '0.5';
+
+        try {
+            // 1. Storage'da nereye kaydedilecek? "avatars/kullaniciID"
+            const storageRef = ref(storage, `avatars/${currentUser.uid}`);
+
+            // 2. Dosyayı yükle
+            const snapshot = await uploadBytes(storageRef, file);
+
+            // 3. Yüklenen dosyanın internet linkini (URL) al
+            const downloadURL = await getDownloadURL(snapshot.ref);
+
+            // 4. Firebase Auth Profilini Güncelle
+            await updateProfile(currentUser, { photoURL: downloadURL });
+
+            // 5. Firestore Veritabanını Güncelle
+            const userDocRef = doc(db, "users", currentUser.uid);
+            await setDoc(userDocRef, { photoURL: downloadURL }, { merge: true });
+
+            // 6. Ekranda göster
+            avatarImage.src = downloadURL;
+            avatarImage.style.opacity = '1';
+            
+            // Sidebar'daki resmi de güncelle
+            const sidebarImg = document.querySelector('#view-home .ProfilKutusu img');
+            if(sidebarImg) sidebarImg.src = downloadURL;
+
+            alert("Profil fotoğrafı güncellendi!");
+
+        } catch (error) {
+            console.error("Yükleme hatası:", error);
+            alert("Fotoğraf yüklenirken hata oluştu: " + error.message);
+            avatarImage.style.opacity = '1';
+        }
+    });
+}
+// --------------------------------------
 
 let currentUser = null;
 
@@ -140,10 +192,22 @@ onAuthStateChanged(auth, (user) => {
     const logoutBtn = document.getElementById('logout-btn'); 
     if(logoutBtn) logoutBtn.classList.remove('d-none');
 
-    // Sidebar'daki Hoşgeldiniz kısmını güncelle
+    // Sidebar'daki Hoşgeldiniz ve Resim kısmını güncelle
     const sidebarNameLabel = document.getElementById('sidebar-username');
+    const sidebarImg = document.querySelector('#view-home .ProfilKutusu img');
+
     if(sidebarNameLabel) {
         sidebarNameLabel.textContent = user.displayName || user.email.split('@')[0];
+    }
+    
+    // Sidebar resmi varsa onu koy, yoksa harf koy
+    if(sidebarImg) {
+        if(user.photoURL) {
+            sidebarImg.src = user.photoURL;
+        } else {
+             const dName = user.displayName || user.email.split('@')[0];
+             sidebarImg.src = `https://ui-avatars.com/api/?name=${dName}&background=random&size=200`;
+        }
     }
 
     router('view-home');
@@ -233,7 +297,6 @@ async function loadEvents() {
         } else if (inCooldown) {
           buttonHTML = `<button class="KatilButonu btn-disabled" disabled>Bekle (${remainingTime}s)</button>`;
         } else {
-          // Çıkış butonu şimdilik pasif veya alert verebilir, istersen aktif edebiliriz
           buttonHTML = `<button class="KatilButonu btn-cik" data-id="${id}" style="background-color:#95a5a6;">Katıldın</button>`;
         }
       } else {
@@ -313,7 +376,7 @@ async function katil(docId) {
   }
 }
 
-// --- DETAY GÖSTERME (Açıklama + Katılımcılar) ---
+// --- DETAY GÖSTERME ---
 async function showEventDetails(docId) {
   if (!docId) return;
 
@@ -345,6 +408,7 @@ async function showEventDetails(docId) {
     }
     const data = snap.data();
 
+    // Katılımcı İsimlerini ve Resimlerini Çekme (GÜNCELLENDİ)
     let participantsHtml = '<span class="text-muted fst-italic small">Henüz kimse katılmamış.</span>';
     
     if (data.katilimcilar && data.katilimcilar.length > 0) {
@@ -355,7 +419,13 @@ async function showEventDetails(docId) {
             if(us.exists()) {
                 const uData = us.data();
                 const uName = uData.adSoyad || uData.displayName || uData.email;
-                return `<li class="mb-1"><i class="fas fa-user-circle text-muted me-2"></i>${uName}</li>`;
+                // Fotoğraf varsa onu kullan, yoksa harfli avatar
+                const uPic = uData.photoURL || `https://ui-avatars.com/api/?name=${uName}&background=random`;
+                
+                return `<li class="mb-2 d-flex align-items-center">
+                          <img src="${uPic}" class="rounded-circle me-2" style="width:24px; height:24px; object-fit:cover;">
+                          <span>${uName}</span>
+                        </li>`;
             } else {
                 return `<li class="mb-1 text-muted"><i class="fas fa-user-slash me-2"></i>Bilinmeyen Kullanıcı</li>`;
             }
@@ -404,7 +474,7 @@ async function showEventDetails(docId) {
   }
 }
 
-// --- KAYIT OLMA İŞLEMİ ---
+// --- KAYIT OLMA ---
 const registerBtn = document.getElementById('register-btn');
 if(registerBtn) {
     registerBtn.addEventListener('click', async () => {
@@ -419,8 +489,11 @@ if(registerBtn) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            
+            // Varsayılan avatar
+            const defPic = `https://ui-avatars.com/api/?name=${name}&background=random&size=200`;
 
-            await updateProfile(user, { displayName: name }); 
+            await updateProfile(user, { displayName: name, photoURL: defPic }); 
 
             await setDoc(doc(db, "users", user.uid), {
                 adSoyad: name,
@@ -429,6 +502,7 @@ if(registerBtn) {
                 telefon: phone,
                 phone: phone, 
                 email: email,
+                photoURL: defPic,
                 kayitTarihi: new Date().toISOString()
             });
 
@@ -441,7 +515,7 @@ if(registerBtn) {
     });
 }
 
-// --- ETKİNLİK OLUŞTURMA İŞLEMLERİ ---
+// --- ETKİNLİK OLUŞTURMA ---
 const showCreateBtn = document.getElementById('btn-show-create'); 
 if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-create'));
 
@@ -505,9 +579,7 @@ if(saveBtn) {
     });
 }
 
-// --- PROFİL DÜZENLEME İŞLEMLERİ ---
-
-// A) Modalı Açma
+// --- PROFİL DÜZENLEME ---
 const btnEditOpen = document.getElementById('btn-edit-profile-open');
 const modalEditProfile = document.getElementById('view-edit-profile');
 
@@ -533,7 +605,6 @@ if(btnEditOpen) {
     });
 }
 
-// B) Modalı Kapatma
 const btnEditClose = document.getElementById('btn-close-edit-profile');
 if(btnEditClose) {
     btnEditClose.addEventListener('click', () => {
@@ -541,7 +612,6 @@ if(btnEditClose) {
     });
 }
 
-// C) Kaydetme İşlemi
 const btnSaveProfile = document.getElementById('btn-save-profile');
 if(btnSaveProfile) {
     btnSaveProfile.addEventListener('click', async () => {
