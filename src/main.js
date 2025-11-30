@@ -5,7 +5,7 @@ import 'bootstrap';
 
 
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc,setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
 
 // HTML Elementlerini Seçme
@@ -13,11 +13,13 @@ const loginBolumu = document.getElementById('view-login');
 const homeBolumu = document.getElementById('view-home');
 const olusturmaBolumu = document.getElementById('view-create'); 
 const eventsContainer = document.getElementById('events-list');
+const registerBolumu = document.getElementById('view-register');
+const profilBolumu = document.getElementById('view-profile');
 
 // Router Sistemi
 const router = (viewId) => {
   // Bütün bölümleri gizle
-  [loginBolumu, homeBolumu, olusturmaBolumu, document.getElementById('view-profile')].forEach(el => el && el.classList.add('d-none'));
+  [loginBolumu, homeBolumu, olusturmaBolumu, registerBolumu, profilBolumu].forEach(el => el && el.classList.add('d-none'));
   
   // İstenileni aç
   const target = document.getElementById(viewId);
@@ -31,6 +33,8 @@ async function loadProfileData() {
     if(!currentUser) return;
 
     // Üst bilgileri doldur
+    
+    
     document.getElementById('profile-email').textContent = currentUser.email.split('@')[0];
     document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${currentUser.email}&background=random&size=200`;
 
@@ -41,7 +45,8 @@ async function loadProfileData() {
     listJoined.innerHTML = '<div class="spinner-border text-warning"></div>';
 
     try {
-        const snapshot = await getDocs(collection(db, "events"));
+      const userDocRef = await getDocs(collection(db, "users"));  
+      const snapshot = await getDocs(collection(db, "events"));
 
         let createdHTML = '';
         let joinedHTML = '';
@@ -58,12 +63,7 @@ async function loadProfileData() {
                     ${data.baslik} <br> 
                     <small class="text-muted fw-normal">${data.tarih || ''} - ${data.saat || ''}</small>
                 </div>
-<<<<<<< HEAD
                            </div>`;
-=======
-                
-            </div>`;
->>>>>>> a091770c758cad0ccdf1d11ec3c04d3fff8a1a65
 
             // A) Oluşturduklarım
             if (data.olusturanEmail === currentUser.email) {
@@ -99,6 +99,7 @@ onAuthStateChanged(auth, (user) => {
 
   if(user) {
     currentUser = user;
+    const username = document.getElementById('user-username');
     const userEmailSpan = document.getElementById('user-email');
     const logoutBtn = document.getElementById('logout-btn'); 
 
@@ -204,7 +205,7 @@ async function loadEvents() {
 
     <div class="Kontenjan">
         <span>${data.katilimciSayisi}<br>—</span>
-        <span>${data.kontenjan}</span>
+                <span>${data.kontenjan}</span>
     </div>
 </div>
 `;
@@ -321,7 +322,44 @@ async function showEventDetails(docId) {
     console.error('Detay yükleme hatası:', err);
   }
 }
+// --- KAYIT OLMA İŞLEMİ ---
+const registerBtn = document.getElementById('register-btn');
+if(registerBtn) {
+    registerBtn.addEventListener('click', async () => {
+        // 1. Verileri Al
+        const name = document.getElementById('reg-name').value;
+        const username = document.getElementById('reg-username').value;
+        
+        const phone = document.getElementById('reg-phone').value;
+        
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
 
+        if(!email || !pass || !name) return alert("Lütfen zorunlu alanları doldurun.");
+
+        try {
+            // 2. Auth ile Kullanıcı Oluştur (UID Alınır)
+            const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+            const user = userCredential.user;
+
+            // 3. Firestore'a Kullanıcı Detaylarını Kaydet (user.uid ile)
+            await setDoc(doc(db, "users", user.uid), {
+                adSoyad: name,
+                kullaniciAdi: username,
+                telefon: phone,
+                email: email,
+                kayitTarihi: new Date().toISOString()
+            });
+
+            alert("Kayıt başarılı! Giriş yapılıyor...");
+            // onAuthStateChanged otomatik olarak anasayfaya atacak
+
+        } catch (error) {
+            console.error(error);
+            alert("Kayıt Hatası: " + error.message);
+        }
+    });
+}
 // --- ETKİNLİK OLUŞTURMA İŞLEMLERİ ---
 const showCreateBtn = document.getElementById('btn-show-create'); 
 if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-create'));
@@ -391,5 +429,13 @@ if(saveBtn) {
             alert("Hata: " + err.message);
         }
     });
+}
+if(saveBtn){
+  saveBtn.addEventListener('click', async () => {
+
+    const adSoyad = document.getElementById('create-adSoyad').value;
+    const yas = document.getElementById('create-yas').value;
+    const okuduguUni = document.getElementById('create-okuduguUni').value;
+  })
 }
 window.router = router;
