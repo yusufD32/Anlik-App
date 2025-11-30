@@ -21,7 +21,7 @@
         <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
             <div class="text-center mb-4">
                 <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-bolt fa-3x"></i>
+                    <img src="./src/images/AnlikLogo.png" width="80px">
                 </div>
                 <h3 class="fw-bold text-dark">Giriş Yap</h3>
                 <p class="text-muted">Anlık'a hoş geldin!</p>
@@ -46,7 +46,7 @@
         <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
             <div class="text-center mb-4">
                 <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-bolt fa-3x"></i>
+                    <img src="./src/images/AnlikLogo.png" width="80px">
                 </div>
                 <h3 class="fw-bold text-dark">Kayıt Ol</h3>
                 <p class="text-muted">Anlık'a hoş geldin!</p>
@@ -84,7 +84,7 @@
             
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
                 <div class="ProfilKutusu shadow-sm "  >
-                         <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')">
+                          <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')">
                     </div>
                 
                 
@@ -130,10 +130,10 @@
     </div>
 </nav>
                 <div class="d-flex justify-content-between align-items-center mb-5">
-                   
-                   
-                   
-                                            
+                    
+                    
+                    
+                                                  
                 </div>
 
                 <div id="events-list">
@@ -169,6 +169,13 @@
                     </div>
                     <div class="ms-4">
                         <h2 class="fw-bold text-dark mb-1" id="profile-email">Yükleniyor...</h2>
+
+                        <p class="text-muted mb-1" id="profile-fullname" style="font-size: 0.9rem;"></p>
+                        <p class="text-muted mb-2" id="profile-phone" style="font-size: 0.9rem;"></p>
+
+                        <button id="btn-edit-profile-open" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold">
+                            <i class="fas fa-pen me-2"></i> Profili Düzenle
+                        </button>
                         <div class="d-flex gap-3 mt-3">
                             <span class="badge bg-white text-dark p-2 border shadow-sm">
                                 🔢 <span id="stat-created">0</span> Oluşturulan
@@ -243,7 +250,7 @@
 
             <div id="about-content" style="max-height:60vh; overflow:auto;">
 
-               
+                
                 <section style="margin-bottom:12px;">
                     <h6 class="fw-bold">İletişim</h6>
                     <div id="contact-text" class="text-muted">E-posta: info@akdemis.com<br>Telefon: 0 242 xxx xx xx</div>
@@ -252,8 +259,29 @@
 
         </div>
     </div>
-    </div>
+    
+    <div id="view-edit-profile" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10001; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
+        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 450px; background: #fff;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark m-0">Profili Düzenle</h4>
+                <button id="btn-close-edit-profile" class="btn-close"></button>
+            </div>
 
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Adınız Soyadınız</label>
+                <input type="text" id="edit-fullname" class="form-control shadow-sm">
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Telefon Numarası</label>
+                <input type="text" id="edit-phone" class="form-control shadow-sm">
+            </div>
+
+            <button id="btn-save-profile" class="btn btn-warning w-100 text-white fw-bold py-2 rounded-pill shadow mt-2">
+                Değişiklikleri Kaydet
+            </button>
+        </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
