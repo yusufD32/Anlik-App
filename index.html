@@ -11,12 +11,14 @@
 </head>
 <body>
 
+    <!-- Yükleniyor Ekranı -->
     <div id="loading">
         <div class="d-flex justify-content-center align-items-center vh-100 bg-white fixed-top" style="z-index:9999;">
             <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;"></div>
         </div>
     </div>
 
+    <!-- GİRİŞ EKRANI -->
     <div id="view-login" class="d-flex justify-content-center align-items-center vh-100 bg-white">
         <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
             <div class="text-center mb-4">
@@ -28,219 +30,240 @@
             </div>
             
             <div class="form-floating mb-3">
-                <input type="email" id="email-input" class="form-control" placeholder="name@example.com">
+                <input type="email" id="login-email" class="form-control" placeholder="name@example.com">
                 <label>Email Adresi</label>
             </div>
             <div class="form-floating mb-4">
-                <input type="password" id="password-input" class="form-control" placeholder="Password">
+                <input type="password" id="login-password" class="form-control" placeholder="Password">
                 <label>Şifre</label>
             </div>
 
             <button id="login-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Giriş Yap</button>
-            <a id="to-register" class="d-block text-center text-primary mt-3 small" style="cursor:pointer; text-decoration:underline;" href="document.getElementById('register-btn').click()">Hesabınız Yoksa Oturum Açın</a>
             <div id="login-error" class="text-danger mt-3 text-center small fw-bold"></div>
-        </div>
-    </div>
-
-    <div id="view-register" class="d-flex justify-content-center align-items-center vh-100 bg-white">
-        <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
-            <div class="text-center mb-4">
-                <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
-                    <img src="./src/images/AnlikLogo.png" width="80px">
-                </div>
-                <h3 class="fw-bold text-dark">Kayıt Ol</h3>
-                <p class="text-muted">Anlık'a hoş geldin!</p>
-            </div>
             
-            <div class="form-floating mb-3">
-                <input type="text" id="name-input" class="form-control" placeholder="Adınızı Giriniz">
-                <label>Adınız</label>
+            <div class="text-center mt-3">
+                <span class="text-muted">Hesabın yok mu?</span>
+                <button id="show-register-btn" class="btn btn-link text-warning fw-bold p-0 ms-1">Kayıt Ol</button>
             </div>
-            <div class="form-floating mb-3">
-                <input type="text" id="lastname-input" class="form-control" placeholder="Soyadınızı Giriniz">
-                <label>Soyadınız</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="number" id="phonenumber-input" class="form-control" placeholder="Telefon Numaranızı Giriniz">
-                <label>Telefon Numarası</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="email" id="email-input" class="form-control" placeholder="name@example.com">
-                <label>Email Adresi</label>
-            </div>
-            <div class="form-floating mb-4">
-                <input type="password" id="password-input" class="form-control" placeholder="Password">
-                <label>Şifre</label>
-            </div>
+        </div>
+    </div>
 
-            <button id="register-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Kayıt Ol</button>
-            <div id="register-error" class="text-danger mt-3 text-center small fw-bold"></div>
+    <!-- KAYIT EKRANI -->
+    <div id="view-register" class="d-none">
+        <div class="d-flex justify-content-center align-items-center vh-100 bg-white">
+            <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
+                <div class="text-center mb-4">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-bolt fa-3x"></i>
+                    </div>
+                    <h3 class="fw-bold text-dark">Kayıt Ol</h3>
+                    <p class="text-muted">Anlık'a hoş geldin!</p>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" id="reg-name" class="form-control" placeholder="Ad Soyad">
+                    <label>Ad Soyad *</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="text" id="reg-username" class="form-control" placeholder="Kullanıcı Adı">
+                    <label>Kullanıcı Adı</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="tel" id="reg-phone" class="form-control" placeholder="Telefon">
+                    <label>Telefon Numarası</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="email" id="reg-email" class="form-control" placeholder="name@example.com">
+                    <label>Email Adresi *</label>
+                </div>
+                
+                <div class="form-floating mb-4">
+                    <input type="password" id="reg-password" class="form-control" placeholder="Password">
+                    <label>Şifre *</label>
+                </div>
+
+                <button id="register-btn" class="btn btn-warning btn-lg w-100 text-white fw-bold rounded-pill shadow-sm">Kayıt Ol</button>
+                <div id="register-error" class="text-danger mt-3 text-center small fw-bold"></div>
+                
+                <div class="text-center mt-3">
+                    <span class="text-muted">Zaten hesabın var mı?</span>
+                    <button id="back-to-login-btn" class="btn btn-link text-warning fw-bold p-0 ms-1">Giriş Yap</button>
+                </div>
+            </div>
         </div>
     </div>
 
 
+    <!-- ANA SAYFA -->
     <div id="view-home" class="container-fluid page-container d-none">
         <div class="row h-100">
             
+            <!-- Sol Sidebar -->
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
-                <div class="ProfilKutusu shadow-sm "  >
-                          <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')">
-                    </div>
-                
+                <div class="ProfilKutusu shadow-sm">
+                    <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')" style="cursor:pointer;">
+                </div>
                 
                 <div class="KategoriKutusu mt-4">
-
-                    <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill" >
-                        <i class="fas fa-sign-out-alt me-2" ></i> Çıkış Yap
+                    <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
+                        <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
                     </button>
                 </div>
             </div>
 
+            <!-- Ana İçerik -->
             <div class="col-md-9 AnaIcerik">
 
+                <!-- Üst Navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-4 shadow-sm mb-4 p-3">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold text-warning d-md-none">Anlık</span>
+                    <div class="container-fluid">
+                        <span class="navbar-brand fw-bold text-warning d-md-none">Anlık</span>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ustMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="ustMenu">
-            
-           
-
-            <div class="d-flex align-items-center flex-grow-1 me-3">
-                <input type="text" class="form-control border-0 bg-white shadow-none" placeholder="ETKİNLİK ARA...">
-                <button class="btn btn-warning text-white rounded-pill ms-2 px-3">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-
-            <div class="d-flex align-items-center mt-3 mt-lg-0">
-                <button class="btn btn-info text-white rounded-pill shadow-sm fw-bold me-3" onclick="document.getElementById('view-create').classList.remove('d-none')">
-                    <i class="fas fa-plus me-2"></i> Etkinlik
-                </button>
-                
-                <a href="#" id="btn-open-about" onclick="document.getElementById('view-about').classList.remove('d-none'); return false;">
-                    <img src="./src/images/AnlikLogo.png" style="width: 50px;" title="Hakkımızda">
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
-                <div class="d-flex justify-content-between align-items-center mb-5">
-                    
-                    
-                    
-                                                  
-                </div>
-
-                <div id="events-list">
-                    </div>
-
-            </div>
-        </div>
-    </div>
-    <div id="view-profile" class="container-fluid page-container d-none">
-    <div class="row h-100">
-        <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
-            <div class="Logo" onclick="router('view-home')" style="cursor: pointer; width: 60px; height: 60px;">
-                <i class="fa-solid fa-arrow-left text-warning"></i> </div>
-            
-            <div class="KategoriKutusu mt-4 " class="sticky">
-                <h5 class="KategoriBaslik">MENÜ</h5>
-                <ul class="KategoriListesi">
-                    <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
-                    <li class="KategoriOgesi Aktif">PROFİLİM</li>
-                </ul>
-                <button id="logout-btn-2" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
-                    <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
-                </button>
-            </div>
-        </div>
-
-        <div class="col-md-9 AnaIcerik">
-            
-            <div class="card border-0 shadow-sm mb-4 rounded-4" style="background-color: #fdf6e3;">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="ProfilKutusu-Buyuk">
-                        <img id="profile-avatar" src="" alt="Avatar">
-                    </div>
-                    <div class="ms-4">
-                        <h2 class="fw-bold text-dark mb-1" id="profile-email">Yükleniyor...</h2>
-
-                        <p class="text-muted mb-1" id="profile-fullname" style="font-size: 0.9rem;"></p>
-                        <p class="text-muted mb-2" id="profile-phone" style="font-size: 0.9rem;"></p>
-
-                        <button id="btn-edit-profile-open" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold">
-                            <i class="fas fa-pen me-2"></i> Profili Düzenle
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ustMenu">
+                            <span class="navbar-toggler-icon"></span>
                         </button>
-                        <div class="d-flex gap-3 mt-3">
-                            <span class="badge bg-white text-dark p-2 border shadow-sm">
-                                🔢 <span id="stat-created">0</span> Oluşturulan
-                            </span>
-                            <span class="badge bg-white text-dark p-2 border shadow-sm">
-                                🎟️ <span id="stat-joined">0</span> Katılım
-                            </span>
+
+                        <div class="collapse navbar-collapse" id="ustMenu">
+                            
+                            <div class="d-flex align-items-center flex-grow-1 me-3">
+                                <input type="text" class="form-control border-0 bg-white shadow-none" placeholder="ETKİNLİK ARA...">
+                                <button class="btn btn-warning text-white rounded-pill ms-2 px-3">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex align-items-center mt-3 mt-lg-0">
+                                <button id="btn-show-create" class="btn btn-info text-white rounded-pill shadow-sm fw-bold me-3">
+                                    <i class="fas fa-plus me-2"></i> Etkinlik
+                                </button>
+                                
+                                <a href="#" id="btn-open-about">
+                                    <img src="./src/images/AnlikLogo.png" style="width: 50px;" title="Hakkımızda">
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Etkinlik Listesi -->
+                <div id="events-list"></div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFİL SAYFASI -->
+    <div id="view-profile" class="container-fluid page-container d-none">
+        <div class="row h-100">
+            
+            <!-- Sol Sidebar -->
+            <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
+                <div class="Logo" onclick="router('view-home')" style="cursor: pointer;">
+                    <i class="fa-solid fa-arrow-left text-warning fa-2x"></i>
+                </div>
+                
+                <div class="KategoriKutusu mt-4">
+                    <h5 class="KategoriBaslik">MENÜ</h5>
+                    <ul class="KategoriListesi">
+                        <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
+                        <li class="KategoriOgesi Aktif">PROFİLİM</li>
+                    </ul>
+                    <button id="logout-btn-2" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
+                        <i class="fas fa-sign-out-alt me-2"></i> Çıkış Yap
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profil İçeriği -->
+            <div class="col-md-9 AnaIcerik">
+                
+                <!-- Profil Kartı -->
+                <div class="card border-0 shadow-sm mb-4 rounded-4" style="background-color: #fdf6e3;">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        
+                        <div style="width: 120px; height: 120px; border-radius: 50%; overflow: hidden; border: 4px solid #fff;">
+                            <img id="profile-avatar" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+
+                        <div class="ms-4">
+                            <h2 class="fw-bold text-dark mb-0" id="profile-name">Yükleniyor...</h2>
+                            <p class="text-muted mb-2" id="profile-username">@...</p>
+                            <p class="mb-0 text-muted" id="profile-email">email@...</p>
+
+                            <div class="d-flex gap-3 mt-3">
+                                <span class="badge bg-white text-dark p-2 border shadow-sm">
+                                    📝 <span id="stat-created">0</span> Oluşturulan
+                                </span>
+                                <span class="badge bg-white text-dark p-2 border shadow-sm">
+                                    ✅ <span id="stat-joined">0</span> Katılım
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Oluşturduğum Etkinlikler -->
+                <h5 class="fw-bold mb-3 text-secondary">Oluşturduğum Etkinlikler</h5>
+                <div id="list-created">Yükleniyor...</div>
+
+                <!-- Katıldığım Etkinlikler -->
+                <h5 class="fw-bold mb-3 mt-5 text-secondary">Katıldığım Etkinlikler</h5>
+                <div id="list-joined">Yükleniyor...</div>
+
             </div>
-
-            <h4 class="fw-bold mb-3" style="color:#555;">Oluşturduğum Etkinlikler</h4>
-            <div id="list-created">Yükleniyor...</div>
-
-            <h4 class="fw-bold mb-3 mt-5" style="color:#555;">Katıldığım Etkinlikler</h4>
-            <div id="list-joined">Yükleniyor...</div>
         </div>
     </div>
-</div>
 
+    <!-- ETKİNLİK OLUŞTURMA MODAL -->
     <div id="view-create" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
-    <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 500px; background: #fff8e1;"> <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="fw-bold text-dark m-0">Yeni Etkinlik</h4>
-            <button id="btn-cancel-create" class="btn-close"></button>
-        </div>
-        
-        <div class="mb-3">
-            <label class="fw-bold small text-muted">Başlık</label>
-            <input type="text" id="create-title" class="form-control form-control-lg border-0 shadow-sm" placeholder="Örn: Akşam Halı Saha">
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-6">
-                <label class="fw-bold small text-muted">Tarih</label>
-                <input type="date" id="create-date" class="form-control border-0 shadow-sm">
+        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 500px; max-width:95%; background: #fff8e1;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark m-0">Yeni Etkinlik</h4>
+                <button id="btn-cancel-create" class="btn-close"></button>
             </div>
-            <div class="col-6">
-                <label class="fw-bold small text-muted">Saat</label>
-                <input type="time" id="create-time" class="form-control border-0 shadow-sm">
+            
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Başlık *</label>
+                <input type="text" id="create-title" class="form-control form-control-lg border-0 shadow-sm" placeholder="Örn: Akşam Halı Saha">
             </div>
-        </div>
 
-        <div class="row mb-3">
-            <div class="col-6">
-                <label class="fw-bold small text-muted">Kontenjan</label>
-                <input type="number" id="create-quota" class="form-control border-0 shadow-sm" value="5">
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Tarih *</label>
+                    <input type="date" id="create-date" class="form-control border-0 shadow-sm">
+                </div>
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Saat *</label>
+                    <input type="time" id="create-time" class="form-control border-0 shadow-sm">
+                </div>
             </div>
-            <div class="col-6">
-                <label class="fw-bold small text-muted">Konum</label>
-                <input type="text" id="create-location" class="form-control border-0 shadow-sm" placeholder="Örn: Kampüs">
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Kontenjan</label>
+                    <input type="number" id="create-quota" class="form-control border-0 shadow-sm" value="5" min="2">
+                </div>
+                <div class="col-6">
+                    <label class="fw-bold small text-muted">Konum *</label>
+                    <input type="text" id="create-location" class="form-control border-0 shadow-sm" placeholder="Örn: Kampüs">
+                </div>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <label class="fw-bold small text-muted">Açıklama</label>
-            <textarea id="create-desc" class="form-control border-0 shadow-sm" rows="3" placeholder="Detayları buraya yaz... (Örn: Krampon getirmeyi unutmayın)"></textarea>
-        </div>
+            <div class="mb-4">
+                <label class="fw-bold small text-muted">Açıklama</label>
+                <textarea id="create-desc" class="form-control border-0 shadow-sm" rows="3" placeholder="Detayları buraya yaz..."></textarea>
+            </div>
 
-        <button id="btn-save" class="btn btn-primary w-100 text-white fw-bold py-3 rounded-pill shadow mt-2" style="background-color: #3abef9; border:none;">
-            Yayınla ve Paylaş
-        </button>
+            <button id="btn-save" class="btn btn-primary w-100 text-white fw-bold py-3 rounded-pill shadow mt-2" style="background-color: #3abef9; border:none;">
+                Yayınla ve Paylaş
+            </button>
+        </div>
     </div>
-</div>
     
+    <!-- HAKKIMIZDA MODAL -->
     <div id="view-about" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; align-items:center;">
         <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 520px; max-width:95%; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -249,37 +272,21 @@
             </div>
 
             <div id="about-content" style="max-height:60vh; overflow:auto;">
-
-                
                 <section style="margin-bottom:12px;">
                     <h6 class="fw-bold">İletişim</h6>
-                    <div id="contact-text" class="text-muted">E-posta: info@akdemis.com<br>Telefon: 0 242 xxx xx xx</div>
-                </section> 
-            </div>
+                    <div id="contact-text" class="text-muted">
+                        E-posta: info@akdemis.com<br>
+                        Telefon: 0 242 xxx xx xx
+                    </div>
+                </section>
 
-        </div>
-    </div>
-    
-    <div id="view-edit-profile" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10001; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
-        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 450px; background: #fff;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold text-dark m-0">Profili Düzenle</h4>
-                <button id="btn-close-edit-profile" class="btn-close"></button>
+                <section>
+                    <h6 class="fw-bold">Bize Ulaşın</h6>
+                    <div id="contact-form-placeholder" class="text-muted">
+                        Form yerleşimini buraya ekleyin (ör: isim, e-posta, mesaj).
+                    </div>
+                </section>
             </div>
-
-            <div class="mb-3">
-                <label class="fw-bold small text-muted">Adınız Soyadınız</label>
-                <input type="text" id="edit-fullname" class="form-control shadow-sm">
-            </div>
-
-            <div class="mb-3">
-                <label class="fw-bold small text-muted">Telefon Numarası</label>
-                <input type="text" id="edit-phone" class="form-control shadow-sm">
-            </div>
-
-            <button id="btn-save-profile" class="btn btn-warning w-100 text-white fw-bold py-2 rounded-pill shadow mt-2">
-                Değişiklikleri Kaydet
-            </button>
         </div>
     </div>
     <script type="module" src="/src/main.js"></script>
