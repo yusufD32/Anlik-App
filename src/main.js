@@ -13,20 +13,21 @@ const loginBolumu = document.getElementById('view-login');
 const homeBolumu = document.getElementById('view-home');
 const olusturmaBolumu = document.getElementById('view-create'); 
 const eventsContainer = document.getElementById('events-list');
+const registerBolumu = document.getElementById('view-register');
+const profilBolumu = document.getElementById('view-profile');
 
 // Router Sistemi
 const router = (viewId) => {
-  // Bütün bölümleri gizle
-  [loginBolumu, homeBolumu, olusturmaBolumu, document.getElementById('view-profile')].forEach(el => el && el.classList.add('d-none'));
+  [loginBolumu, homeBolumu, olusturmaBolumu, registerBolumu, profilBolumu].forEach(el => el && el.classList.add('d-none'));
   
-  // İstenileni aç
   const target = document.getElementById(viewId);
-  if (target){ target.classList.remove('d-none');
+  if (target) { 
+    target.classList.remove('d-none');
     if(viewId === 'view-profile') loadProfileData();
-
   }
 };
 
+// --- PROFİL VERİLERİNİ YÜKLE ---
 // --- PROFİL VERİLERİNİ YÜKLE ---
 async function loadProfileData() {
     if(!currentUser) return;
@@ -72,15 +73,28 @@ async function loadProfileData() {
     listJoined.innerHTML = '<div class="spinner-border text-warning"></div>';
 
     try {
-        const snapshot = await getDocs(collection(db, "events"));
+      const userDocRef = doc(db, "users", currentUser.uid);
+      const snapshot = await getDoc(userDocRef);
 
-        let createdHTML = '';
-        let joinedHTML = '';
-        let createdCount = 0;
-        let joinedCount = 0;
+      if(snapshot.exists()) {
+        const userData = snapshot.data();
+        document.getElementById('profile-name').textContent = userData.adSoyad || 'İsimsiz';
+        document.getElementById('profile-username').textContent = userData.kullaniciAdi || '@kullanici';
+      } else {
+        document.getElementById('profile-name').textContent = currentUser.email.split('@')[0];
+        document.getElementById('profile-username').textContent = '@' + currentUser.email.split('@')[0];
+      }
 
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
+      // Etkinlikleri çek
+      const eventsSnap = await getDocs(collection(db, "events"));
+      
+      let createdHTML = '';
+      let joinedHTML = '';
+      let createdCount = 0;
+      let joinedCount = 0;
+
+      eventsSnap.forEach(docSnap => {
+          const data = docSnap.data();
 
             const miniCard = `
             <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
@@ -101,14 +115,16 @@ async function loadProfileData() {
             }
         });
 
-        listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
-        listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
+      listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
+      listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
 
-        document.getElementById('stat-created').textContent = createdCount;
-        document.getElementById('stat-joined').textContent = joinedCount;
-
+      document.getElementById('stat-created').textContent = createdCount;
+      document.getElementById('stat-joined').textContent = joinedCount;
+      
     } catch (error) {
         console.error(error);
+        listCreated.innerHTML = '<div class="text-danger">Veri yüklenemedi.</div>';
+        listJoined.innerHTML = '<div class="text-danger">Veri yüklenemedi.</div>';
     }
 }
 
@@ -151,20 +167,32 @@ onAuthStateChanged(auth, (user) => {
 const loginBtn = document.getElementById('login-btn');
 if(loginBtn) {
   loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('email-input').value;
-    const password = document.getElementById('password-input').value;
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
     const errorDiv = document.getElementById('login-error');
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
     }
     catch (error) {
-      if(errorDiv) errorDiv.textContent = "Giris basarisiz: " + error.message;
+      if(errorDiv) errorDiv.textContent = "Giriş başarısız: " + error.message;
     }
   });
 }
 
-// Çıkış Yap Butonu
+// Kayıt Sayfasına Git
+const showRegisterBtn = document.getElementById('show-register-btn');
+if(showRegisterBtn) {
+  showRegisterBtn.addEventListener('click', () => router('view-register'));
+}
+
+// Login'e Geri Dön
+const backToLoginBtn = document.getElementById('back-to-login-btn');
+if(backToLoginBtn) {
+  backToLoginBtn.addEventListener('click', () => router('view-login'));
+}
+
+// Çıkış Yap Butonları
 const logoutBtn = document.getElementById('logout-btn');
 if(logoutBtn) {
   logoutBtn.addEventListener('click', () => signOut(auth));
@@ -201,7 +229,34 @@ async function loadEvents() {
     });
 
     events.forEach(({ id, data }) => {
-      const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid)
+      const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid);
+      
+      // Katılma/Çıkma geçmişini kontrol et
+      const joinHistory = data.katilimGecmisi?.[currentUser.uid] || { count: 0, lastAction: null };
+      const canLeave = joinHistory.count < 2; // 2 kereden az değişiklik yaptıysa çıkabilir
+      
+      // Cooldown kontrolü (son işlemden 30 saniye geçti mi?)
+      const now = Date.now();
+      const cooldownPeriod = 30000; // 30 saniye
+      const inCooldown = joinHistory.lastAction && (now - joinHistory.lastAction < cooldownPeriod);
+      const remainingTime = inCooldown ? Math.ceil((cooldownPeriod - (now - joinHistory.lastAction)) / 1000) : 0;
+
+      let buttonHTML = '';
+      if (userJoined) {
+        if (!canLeave) {
+          buttonHTML = `<button class="KatilButonu btn-disabled" disabled>Limit Doldu</button>`;
+        } else if (inCooldown) {
+          buttonHTML = `<button class="KatilButonu btn-disabled" disabled>Bekle (${remainingTime}s)</button>`;
+        } else {
+          buttonHTML = `<button class="KatilButonu btn-cik" data-id="${id}">Çık (${2 - joinHistory.count} hak)</button>`;
+        }
+      } else {
+        if (inCooldown) {
+          buttonHTML = `<button class="KatilButonu btn-disabled" disabled>Bekle (${remainingTime}s)</button>`;
+        } else {
+          buttonHTML = `<button class="KatilButonu btn-katil" data-id="${id}">Katıl</button>`;
+        }
+      }
 
       const html = `
 <div class="EtkinlikKartlari shadow-sm">
@@ -222,10 +277,8 @@ async function loadEvents() {
     </div>
     
     <div class="KartAksiyonlari" style="align-self: center;">
-        <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
-            ${userJoined ? 'Katıldın' : 'Katıl'}
-        </button>
-      <i class="fa-solid fa-chevron-down ok-ikonu" data-id="${id}" style="cursor:pointer"></i>
+        ${buttonHTML}
+        <i class="fa-solid fa-chevron-down ok-ikonu" data-id="${id}" style="cursor:pointer"></i>
     </div>
 
     <div class="Kontenjan">
@@ -269,8 +322,8 @@ async function katil(docId) {
       });
       loadEvents(); 
   } catch (error) {
-      console.error("Katılma hatası:", error);
-      alert("Bir hata oluştu: " + error.message);
+    console.error("Katılma hatası:", error);
+    alert("Bir hata oluştu: " + error.message);
   }
 }
 
@@ -335,6 +388,39 @@ async function showEventDetails(docId) {
   }
 }
 
+// --- KAYIT OLMA İŞLEMİ ---
+const registerBtn = document.getElementById('register-btn');
+if(registerBtn) {
+    registerBtn.addEventListener('click', async () => {
+        const name = document.getElementById('reg-name').value;
+        const username = document.getElementById('reg-username').value;
+        const phone = document.getElementById('reg-phone').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+
+        if(!email || !password || !name) return alert("Lütfen zorunlu alanları doldurun.");
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            await setDoc(doc(db, "users", user.uid), {
+                adSoyad: name,
+                kullaniciAdi: username || email.split('@')[0],
+                telefon: phone,
+                email: email,
+                kayitTarihi: new Date().toISOString()
+            });
+
+            alert("Kayıt başarılı! Giriş yapılıyor...");
+
+        } catch (error) {
+            console.error(error);
+            alert("Kayıt Hatası: " + error.message);
+        }
+    });
+}
+
 // --- ETKİNLİK OLUŞTURMA İŞLEMLERİ ---
 const showCreateBtn = document.getElementById('btn-show-create'); 
 if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-create'));
@@ -364,7 +450,7 @@ if(saveBtn) {
         const kontenjan = document.getElementById('create-quota').value;
         const konum = document.getElementById('create-location').value;
         const tarih = document.getElementById('create-date').value; 
-        const saat = document.getElementById('create-time').value; 
+        const saat = document.getElementById('create-time').value;   
         const aciklama = document.getElementById('create-desc').value;
 
         if(!baslik || !konum || !tarih || !saat) return alert("Lütfen gerekli alanları doldurun!");
@@ -373,12 +459,13 @@ if(saveBtn) {
             await addDoc(collection(db, "events"), {
                 baslik, 
                 konum,
-                tarih,    
-                saat,     
-                aciklama, 
+                tarih,
+                saat,
+                aciklama,
                 kontenjan: Number(kontenjan),
                 katilimciSayisi: 1,
                 katilimcilar: [currentUser.uid],
+                katilimGecmisi: {}, // Yeni alan: Her kullanıcının değişiklik sayısını tutar
                 olusturanEmail: currentUser.email,
                 olusturulmaTarihi: new Date().toISOString()
             });
