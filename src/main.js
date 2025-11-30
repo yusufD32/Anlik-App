@@ -201,9 +201,7 @@ async function loadEvents() {
     </div>
 
     <div class="Kontenjan">
-        <span>${data.katilimciSayisi}<br>--
-        </span>
-        <div class="Cizgi"></div>
+        <span>${data.katilimciSayisi}<br>—</span>
         <span>${data.kontenjan}</span>
     </div>
 </div>

@@ -1,22 +1,26 @@
-
+/* style.css - CLEAN & MODERN PALETİ */
 :root {
-   --kenar-cubugu-bg: #E9F5FF;  
-    --ana-bg: #c8e2f6;            
-    --kart-bg: #FFFFFF;           
-    --buton-mavi: #ed7337;      
-    --yazi-koyu: #1E1E1E; 
+    /* BASIT VE ETKİLİ RENK PALETİ */
+    --kenar-cubugu-bg: #FFFFFF;        /* Temiz beyaz */
+    --ana-bg: #F8F9FA;                 /* Çok açık gri */
+    --kart-bg: #FFFFFF;                /* Beyaz */
+    --buton-primary: #FF6B35;          /* Turuncu - ana renk */
+    --buton-accent: #FFB84D;           /* Açık turuncu/sarı - CTA */
+    --yazi-koyu: #2D3436;              /* Koyu gri */
+    --yazi-acik: #636E72;              /* Orta gri */
+    --border-renk: #DFE6E9;            /* Açık gri border */
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-x: hidden;
-    background-color: var(--ana-bg); 
+    background-color: var(--ana-bg);
 }
 
 
 .page-container {
     min-height: 100vh;
-    background-color: white; 
+    background-color: var(--ana-bg);
 }
 
 
@@ -24,41 +28,47 @@ body {
     background-color: var(--kenar-cubugu-bg);
     padding: 20px;
     min-height: 100vh;
+    border-right: 1px solid var(--border-renk);
 }
 
 .Logo {
     width: 120px; height: 120px;
-    background-color: white;
+    background-color: var(--buton-primary);
     border-radius: 50%;
     border: 5px solid #fff;
     margin: 0 40px 40px auto;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
 }
 
-.Logo i { font-size: 50px; color: var(--ana-bg); }
+.Logo i { 
+    font-size: 50px; 
+    color: #FFFFFF;
+}
+
 .Logo:hover {
     width: 130px; height: 130px;
     transition: 0.8s;
 }
 
 .KategoriKutusu {
-    background-color: #fdf6e3;
+    background-color: #F8F9FA;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     padding-bottom: 30px;
+    border: 1px solid var(--border-renk);
 }
 
 .KategoriBaslik {
     font-weight: 800;
     text-decoration: underline;
     margin-bottom: 15px;
-    color: #4a4a4a;
+    color: var(--yazi-koyu);
 }
 
 .KategoriListesi {
-    list-style: none; 
+    list-style: none;
     padding: 0;
     margin: 0;
 }
@@ -69,16 +79,16 @@ body {
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.2s;
-    color: #4a4a4a;
+    color: var(--yazi-acik);
 }
 
 .KategoriOgesi:hover {
-    background-color: rgba(238, 188, 77, 0.2);
-    color: var(--ana-bg);
+    background-color: rgba(255, 107, 53, 0.1);
+    color: var(--buton-primary);
 }
 
 .KategoriOgesi.Aktif {
-    background-color: var(--ana-bg);
+    background-color: var(--buton-primary);
     color: white;
 }
 
@@ -91,8 +101,8 @@ body {
 
 
 .AramaCubugu {
-    background-color: var(--kenar-cubugu-bg);
-    border: none;
+    background-color: #FFFFFF;
+    border: 1px solid var(--border-renk);
     border-radius: 20px 0 0 20px;
     padding: 10px 20px;
     height: 45px;
@@ -100,17 +110,17 @@ body {
 }
 
 .AramaButonu {
-    background-color: #4e4b4b;
+    background-color: var(--yazi-koyu);
     border: none;
     border-radius: 0 20px 20px 0;
-    color: #aaa;
+    color: #FFFFFF;
     padding: 0 20px;
     font-weight: bold;
     height: 45px;
 }
 
 .EtkinlikOlustur {
-    background-color: var(--buton-mavi);
+    background-color: var(--buton-accent);
     color: white;
     border-radius: 10px;
     padding: 0 30px;
@@ -118,16 +128,26 @@ body {
     border: none;
     height: 45px;
     margin-left: 100px;
+    box-shadow: 0 4px 12px rgba(255, 184, 77, 0.3);
+    transition: all 0.3s ease;
 }
 
+.EtkinlikOlustur:hover {
+    background-color: #FFA726;
+    transform: translateY(-2px);
+}
+
+/* Header'daki Küçük Profil Kutusu */
 .ProfilKutusu {
     width: 160px; height: 160px; 
-    background-color: var(--kenar-cubugu-bg);
+    background-color: var(--buton-primary);
     border-radius: 50%; 
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
     cursor: pointer;
     margin-left: 100px;
+    border: 4px solid #FFFFFF;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
 }
 
 .ProfilKutusu img { width: 100%; height: 100%; object-fit: cover; }
@@ -137,11 +157,12 @@ body {
     width: 150px; height: 150px;
     border-radius: 50%;
     overflow: hidden;
-    border: 5px solid var(--ana-bg);
+    border: 5px solid var(--buton-primary);
     margin-bottom: 20px;
 }
 .ProfilKutusu-Buyuk img { width: 100%; height: 100%; object-fit: cover; }
 
+/* KART TASARIMI */
 .EtkinlikKartlari {
     background-color: var(--kart-bg);
     border-radius: 15px;
@@ -152,6 +173,13 @@ body {
     position: relative;
     height: 125px;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border-renk);
+}
+
+.EtkinlikKartlari:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
 .KullaniciProfil {
@@ -159,45 +187,56 @@ body {
     border-radius: 50%;
     object-fit: cover;
     margin-left: 10px;
+    border: 2px solid var(--buton-primary);
 }
 
 .EtkinlikBaslik {
     flex-grow: 1;
     padding-left: 20px;
     font-weight: bold;
-    color: #555;
+    color: var(--yazi-koyu);
     font-size: 1.1rem;
 }
 
 .KartAksiyonlari {
     display: flex; align-items: center; gap: 10px;
-    margin-right: 60px; /* Kontenjan çubuğu için boşluk */
+    margin-right: 60px;
 }
 
 .KatilButonu {
-    background-color: var(--buton-mavi);
+    background-color: var(--buton-primary);
     color: white;
     border: none;
     border-radius: 20px;
     padding: 4px 30px;
     font-weight: bold;
-    
+    transition: all 0.3s ease;
+}
+
+.KatilButonu:hover {
+    background-color: #FF5722;
+    transform: scale(1.05);
 }
 
 .KatilButonu:disabled {
-    background-color: #ccc;
+    background-color: #B2BEC3;
     cursor: not-allowed;
 }
 
 .ok-ikonu {
-    color: #daa520;
+    color: var(--buton-primary);
     font-size: 1.5rem;
     cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ok-ikonu:hover {
+    transform: rotate(90deg);
 }
 
 
 div.Kontenjan {
-    background-color: var(--buton-mavi);
+    background-color: var(--buton-primary);
     color: white;
     height: 125px;
     width: 50px;
@@ -222,10 +261,10 @@ div.Kontenjan > div.Kontenjan {
     position: static; 
 }
 
-
+/* Inline detay kutusu */
 .EtkinlikDetayInline {
     background-color: var(--kart-bg);
-    color: #333;
+    color: var(--yazi-koyu);
     border-radius: 15px;
     padding: 12px 14px;
     margin-top: -15px;
@@ -238,25 +277,20 @@ div.Kontenjan > div.Kontenjan {
     width: calc(100% - 45px);
     font-size: 0.95rem;
     transition: all 0.3s ease;
-    /* background: #ffffff;
-    border-radius: 0 0 15px 15px;
-    padding: 12px 14px;
-    margin-top: -15px;
-    margin-bottom: 20px;
-    position: relative;
-    z-index: 1;
-    font-size: 0.95rem;
-    color: #333; */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--border-renk);
 }
 
 .EtkinlikDetayInline .detay-aciklama {
-    color: #555;
+    color: var(--yazi-acik);
     margin-top: 8px;
     line-height: 1.3;
 }
+
 #view-register{
     display: none !important;
 }
+
 .sticky{
     position: sticky;
 }
