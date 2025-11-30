@@ -58,7 +58,12 @@ async function loadProfileData() {
                     ${data.baslik} <br> 
                     <small class="text-muted fw-normal">${data.tarih || ''} - ${data.saat || ''}</small>
                 </div>
+<<<<<<< HEAD
                            </div>`;
+=======
+                
+            </div>`;
+>>>>>>> a091770c758cad0ccdf1d11ec3c04d3fff8a1a65
 
             // A) Oluşturduklarım
             if (data.olusturanEmail === currentUser.email) {
@@ -198,9 +203,7 @@ async function loadEvents() {
     </div>
 
     <div class="Kontenjan">
-        <span>${data.katilimciSayisi}<br>--
-        </span>
-        <div class="Cizgi"></div>
+        <span>${data.katilimciSayisi}<br>—</span>
         <span>${data.kontenjan}</span>
     </div>
 </div>
@@ -325,6 +328,22 @@ if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-cre
 
 const cancelCreateBtn = document.getElementById('btn-cancel-create'); 
 if(cancelCreateBtn) cancelCreateBtn.addEventListener('click', () => router('view-home'));
+
+// About/Contact overlay toggles (logo click opens it)
+const openAboutBtn = document.getElementById('btn-open-about');
+const aboutOverlay = document.getElementById('view-about');
+const closeAboutBtn = document.getElementById('btn-close-about');
+if (openAboutBtn && aboutOverlay) {
+  openAboutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    aboutOverlay.classList.remove('d-none');
+  });
+}
+if (closeAboutBtn && aboutOverlay) {
+  closeAboutBtn.addEventListener('click', () => {
+    aboutOverlay.classList.add('d-none');
+  });
+}
 
 
 

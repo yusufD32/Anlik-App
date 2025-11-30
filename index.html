@@ -78,6 +78,7 @@
         </div>
     </div>
 
+
     <div id="view-home" class="container-fluid page-container d-none">
         <div class="row h-100">
             
@@ -96,20 +97,43 @@
             </div>
 
             <div class="col-md-9 AnaIcerik">
+
+                <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-4 shadow-sm mb-4 p-3">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold text-warning d-md-none">Anlık</span>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#ustMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="ustMenu">
+            
+           
+
+            <div class="d-flex align-items-center flex-grow-1 me-3">
+                <input type="text" class="form-control border-0 bg-white shadow-none" placeholder="ETKİNLİK ARA...">
+                <button class="btn btn-warning text-white rounded-pill ms-2 px-3">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="d-flex align-items-center mt-3 mt-lg-0">
+                <button class="btn btn-info text-white rounded-pill shadow-sm fw-bold me-3" onclick="document.getElementById('view-create').classList.remove('d-none')">
+                    <i class="fas fa-plus me-2"></i> Etkinlik
+                </button>
                 
+                <a href="#" id="btn-open-about" onclick="document.getElementById('view-about').classList.remove('d-none'); return false;">
+                    <img src="./src/images/AnlikLogo.png" style="width: 50px;" title="Hakkımızda">
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
                 <div class="d-flex justify-content-between align-items-center mb-5">
-                    <div class="d-flex align-items-center flex-grow-1 me-4" style="max-width: 500px">
-                        <input type="text" class="form-control AramaCubugu" placeholder="ETKİNLİK ARA...">
-                        <button class="AramaButonu">ARA</button>
-                    </div>
                    
-                    <button id="btn-show-create" class="EtkinlikOlustur me-3 shadow-sm hover-effect">
-                        <i class="fas fa-plus me-2"></i> Etkinlik  Oluştur
-                    </button> 
-                      <div class="Logo">
-                    <img src="./src/images/AnlikLogo.png" style="width: 110px;">
-                </div>
-                    
+                   
+                   
+                                            
                 </div>
 
                 <div id="events-list">
@@ -209,6 +233,31 @@
         </button>
     </div>
 </div>
+    
+    <div id="view-about" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; align-items:center;">
+        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 520px; max-width:95%; background: #fff;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark m-0">HAKKIMIZDA</h4>
+                <button id="btn-close-about" class="btn-close"></button>
+            </div>
+
+            <div id="about-content" style="max-height:60vh; overflow:auto;">
+
+               
+                <section style="margin-bottom:12px;">
+                    <h6 class="fw-bold">İletişim</h6>
+                    <div id="contact-text" class="text-muted">E-posta: info@akdemis.com<br>Telefon: 0 242 xxx xx xx</div>
+                </section>
+
+                
+                <section>
+                    <h6 class="fw-bold">Bize Ulaşın</h6>
+                    <div id="contact-form-placeholder" class="text-muted">Form yerleşimini buraya ekleyin (ör: isim, e-posta, mesaj).</div>
+                </section>
+            </div>
+
+        </div>
+    </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>
