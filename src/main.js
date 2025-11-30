@@ -515,4 +515,90 @@ if(saveBtn) {
     });
 }
 
+
+
+// --- 3. YENİ EKLENEN KISIM: PROFİL DÜZENLEME İŞLEMLERİ ---
+
+// A) Modalı Açma
+const btnEditOpen = document.getElementById('btn-edit-profile-open');
+const modalEditProfile = document.getElementById('view-edit-profile');
+
+if(btnEditOpen) {
+    btnEditOpen.addEventListener('click', async () => {
+        if(!currentUser) return;
+        
+        // Modalı göster
+        modalEditProfile.classList.remove('d-none');
+        
+        // Mevcut ismi inputa yaz
+        document.getElementById('edit-fullname').value = currentUser.displayName || "";
+        
+        // Veritabanından telefonu çekip inputa yaz
+        try {
+            const userDocRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userDocRef);
+            if(userSnap.exists()) {
+                document.getElementById('edit-phone').value = userSnap.data().phone || "";
+            }
+        } catch(e) {
+            console.log("Telefon çekme hatası", e);
+        }
+    });
+}
+
+// B) Modalı Kapatma
+const btnEditClose = document.getElementById('btn-close-edit-profile');
+if(btnEditClose) {
+    btnEditClose.addEventListener('click', () => {
+        modalEditProfile.classList.add('d-none');
+    });
+}
+
+// C) Kaydetme İşlemi
+const btnSaveProfile = document.getElementById('btn-save-profile');
+if(btnSaveProfile) {
+    btnSaveProfile.addEventListener('click', async () => {
+        const newName = document.getElementById('edit-fullname').value;
+        const newPhone = document.getElementById('edit-phone').value;
+        
+        // Butonu "Kaydediliyor..." yap
+        const originalText = btnSaveProfile.textContent;
+        btnSaveProfile.textContent = "Kaydediliyor...";
+        btnSaveProfile.disabled = true;
+
+        try {
+            // 1. Firebase Auth Profilini Güncelle (İsim için)
+            if(currentUser.displayName !== newName) {
+                await updateProfile(currentUser, {
+                    displayName: newName
+                });
+            }
+
+            // 2. Firestore 'users' koleksiyonuna telefon ve ismi kaydet
+            // setDoc: Varsa günceller, yoksa oluşturur (merge:true sayesinde)
+            await setDoc(doc(db, "users", currentUser.uid), {
+                displayName: newName,
+                phone: newPhone,
+                email: currentUser.email
+            }, { merge: true });
+
+            // Başarılı
+            
+            modalEditProfile.classList.add('d-none');
+            
+            // Profil sayfasını yenile (ekrandaki veriler güncellensin)
+            loadProfileData();
+
+        } catch (error) {
+            console.error(error);
+            alert("Hata oluştu: " + error.message);
+        } finally {
+            // Butonu eski haline getir
+            btnSaveProfile.textContent = originalText;
+            btnSaveProfile.disabled = false;
+        }
+    });
+}
+
+
 window.router = router;
