@@ -3,8 +3,7 @@ import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
-
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
 
@@ -15,10 +14,12 @@ const olusturmaBolumu = document.getElementById('view-create');
 const eventsContainer = document.getElementById('events-list');
 const registerBolumu = document.getElementById('view-register');
 const profilBolumu = document.getElementById('view-profile');
+const editProfileModal = document.getElementById('view-edit-profile'); // Yeni eklenen modal
 
 // Router Sistemi
 const router = (viewId) => {
-  [loginBolumu, homeBolumu, olusturmaBolumu, registerBolumu, profilBolumu].forEach(el => el && el.classList.add('d-none'));
+  // Tüm sayfaları gizle
+  [loginBolumu, homeBolumu, olusturmaBolumu, registerBolumu, profilBolumu, editProfileModal].forEach(el => el && el.classList.add('d-none'));
   
   const target = document.getElementById(viewId);
   if (target) { 
@@ -27,45 +28,57 @@ const router = (viewId) => {
   }
 };
 
-// --- PROFİL VERİLERİNİ YÜKLE ---
-// --- PROFİL VERİLERİNİ YÜKLE ---
+// --- PROFİL VERİLERİNİ YÜKLE (TEK VE TEMİZ FONKSİYON) ---
 async function loadProfileData() {
     if(!currentUser) return;
 
-    // A) Auth Bilgilerini (Email ve İsim) Doldur
-    document.getElementById('profile-email').textContent = currentUser.email;
-    
-    // Avatarı isme göre oluştur, isim yoksa emaile göre
-    const displayName = currentUser.displayName || currentUser.email;
-    document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
-
-    // İsmi yazdır
-    const fullNameEl = document.getElementById('profile-fullname');
-    if(currentUser.displayName) {
-        fullNameEl.textContent = currentUser.displayName;
-    } else {
-        fullNameEl.textContent = "İsim girilmemiş";
-    }
-
-    // B) Firestore'dan Telefon Numarasını Çek
+    // Elementleri tanımla
+    const nameEl = document.getElementById('profile-name');
+    const usernameEl = document.getElementById('profile-username');
+    const emailEl = document.getElementById('profile-email');
     const phoneEl = document.getElementById('profile-phone');
-    phoneEl.textContent = "Yükleniyor..."; 
+    const avatarEl = document.getElementById('profile-avatar');
+    
+    // Varsayılan değerler
+    emailEl.textContent = currentUser.email;
+    let displayName = currentUser.displayName || currentUser.email.split('@')[0];
+    
+    // Avatarı yükle
+    avatarEl.src = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
 
+    // Firestore'dan detaylı verileri çek
     try {
         const userDocRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userDocRef);
         
         if (userSnap.exists()) {
             const userData = userSnap.data();
-            phoneEl.textContent = userData.phone || "Telefon eklenmemiş";
+            
+            // İsim (Veritabanı > Auth > Varsayılan)
+            const finalName = userData.adSoyad || userData.displayName || displayName;
+            nameEl.textContent = finalName;
+            
+            // Kullanıcı adı
+            usernameEl.textContent = userData.kullaniciAdi ? `@${userData.kullaniciAdi}` : `@${currentUser.email.split('@')[0]}`;
+            
+            // Telefon (Varsa göster, yoksa uyarı)
+            const phone = userData.telefon || userData.phone;
+            phoneEl.innerHTML = phone ? `<i class="fas fa-phone-alt me-1"></i> ${phone}` : '<i class="fas fa-phone-slash me-1"></i> Telefon eklenmemiş';
+
+            // Avatarı güncel isme göre yenile
+            avatarEl.src = `https://ui-avatars.com/api/?name=${finalName}&background=random&size=200`;
+
         } else {
-            phoneEl.textContent = "Telefon eklenmemiş";
+            // Veritabanında yoksa sadece Auth bilgisini kullan
+            nameEl.textContent = displayName;
+            usernameEl.textContent = '@' + currentUser.email.split('@')[0];
+            phoneEl.textContent = "Telefon bilgisi yok";
         }
     } catch (e) {
-        console.log("Profil detay hatası:", e);
-        phoneEl.textContent = "-";
+        console.log("Profil verisi çekme hatası:", e);
     }
 
+    // İstatistikler ve Etkinlik Listeleri
     const listCreated = document.getElementById('list-created');
     const listJoined = document.getElementById('list-joined');
 
@@ -73,28 +86,15 @@ async function loadProfileData() {
     listJoined.innerHTML = '<div class="spinner-border text-warning"></div>';
 
     try {
-      const userDocRef = doc(db, "users", currentUser.uid);
-      const snapshot = await getDoc(userDocRef);
+        const eventsSnap = await getDocs(collection(db, "events"));
+        
+        let createdHTML = '';
+        let joinedHTML = '';
+        let createdCount = 0;
+        let joinedCount = 0;
 
-      if(snapshot.exists()) {
-        const userData = snapshot.data();
-        document.getElementById('profile-name').textContent = userData.adSoyad || 'İsimsiz';
-        document.getElementById('profile-username').textContent = userData.kullaniciAdi || '@kullanici';
-      } else {
-        document.getElementById('profile-name').textContent = currentUser.email.split('@')[0];
-        document.getElementById('profile-username').textContent = '@' + currentUser.email.split('@')[0];
-      }
-
-      // Etkinlikleri çek
-      const eventsSnap = await getDocs(collection(db, "events"));
-      
-      let createdHTML = '';
-      let joinedHTML = '';
-      let createdCount = 0;
-      let joinedCount = 0;
-
-      eventsSnap.forEach(docSnap => {
-          const data = docSnap.data();
+        eventsSnap.forEach(docSnap => {
+            const data = docSnap.data();
 
             const miniCard = `
             <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
@@ -115,16 +115,16 @@ async function loadProfileData() {
             }
         });
 
-      listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
-      listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
+        listCreated.innerHTML = createdHTML || '<div class="text-muted fst-italic">Henüz etkinlik oluşturmadın.</div>';
+        listJoined.innerHTML = joinedHTML || '<div class="text-muted fst-italic">Henüz bir etkinliğe katılmadın.</div>';
 
-      document.getElementById('stat-created').textContent = createdCount;
-      document.getElementById('stat-joined').textContent = joinedCount;
+        document.getElementById('stat-created').textContent = createdCount;
+        document.getElementById('stat-joined').textContent = joinedCount;
       
     } catch (error) {
         console.error(error);
-        listCreated.innerHTML = '<div class="text-danger">Veri yüklenemedi.</div>';
-        listJoined.innerHTML = '<div class="text-danger">Veri yüklenemedi.</div>';
+        listCreated.innerHTML = '<div class="text-danger">Hata oluştu.</div>';
+        listJoined.innerHTML = '<div class="text-danger">Hata oluştu.</div>';
     }
 }
 
@@ -133,32 +133,23 @@ let currentUser = null;
 // Firebase Oturum Dinleyici
 onAuthStateChanged(auth, (user) => {
   const loadingElement = document.getElementById('loading');
-  
   if (loadingElement) loadingElement.classList.add('d-none');
 
   if(user) {
     currentUser = user;
-    const userEmailSpan = document.getElementById('user-email');
     const logoutBtn = document.getElementById('logout-btn'); 
-
-    if(userEmailSpan) userEmailSpan.textContent = user.email;
     if(logoutBtn) logoutBtn.classList.remove('d-none');
 
-    // --- YENİ EKLENEN: Sidebar'daki Hoşgeldiniz kısmını güncelle ---
+    // Sidebar'daki Hoşgeldiniz kısmını güncelle
     const sidebarNameLabel = document.getElementById('sidebar-username');
     if(sidebarNameLabel) {
-        // İsim varsa ismini, yoksa emailin başını al
         sidebarNameLabel.textContent = user.displayName || user.email.split('@')[0];
     }
-    // -----------------------------------------------------------
 
     router('view-home');
     loadEvents(); 
   } else {
     currentUser = null;
-    const logoutBtn = document.getElementById('logout-btn');
-    if(logoutBtn) logoutBtn.classList.add('d-none');
-    
     router('view-login');
   }
 });
@@ -194,14 +185,10 @@ if(backToLoginBtn) {
 
 // Çıkış Yap Butonları
 const logoutBtn = document.getElementById('logout-btn');
-if(logoutBtn) {
-  logoutBtn.addEventListener('click', () => signOut(auth));
-}
-// Çıkış Yap Butonu 2
+if(logoutBtn) logoutBtn.addEventListener('click', () => signOut(auth));
+
 const logoutBtn2 = document.getElementById('logout-btn-2');
-if(logoutBtn2) {
-  logoutBtn2.addEventListener('click', () => signOut(auth));
-}
+if(logoutBtn2) logoutBtn2.addEventListener('click', () => signOut(auth));
 
 // Verileri Çekme Fonksiyonu
 async function loadEvents() {
@@ -231,13 +218,11 @@ async function loadEvents() {
     events.forEach(({ id, data }) => {
       const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid);
       
-      // Katılma/Çıkma geçmişini kontrol et
       const joinHistory = data.katilimGecmisi?.[currentUser.uid] || { count: 0, lastAction: null };
-      const canLeave = joinHistory.count < 2; // 2 kereden az değişiklik yaptıysa çıkabilir
+      const canLeave = joinHistory.count < 2; 
       
-      // Cooldown kontrolü (son işlemden 30 saniye geçti mi?)
       const now = Date.now();
-      const cooldownPeriod = 30000; // 30 saniye
+      const cooldownPeriod = 30000; 
       const inCooldown = joinHistory.lastAction && (now - joinHistory.lastAction < cooldownPeriod);
       const remainingTime = inCooldown ? Math.ceil((cooldownPeriod - (now - joinHistory.lastAction)) / 1000) : 0;
 
@@ -248,7 +233,8 @@ async function loadEvents() {
         } else if (inCooldown) {
           buttonHTML = `<button class="KatilButonu btn-disabled" disabled>Bekle (${remainingTime}s)</button>`;
         } else {
-          buttonHTML = `<button class="KatilButonu btn-cik" data-id="${id}">Çık (${2 - joinHistory.count} hak)</button>`;
+          // Çıkış butonu şimdilik pasif veya alert verebilir, istersen aktif edebiliriz
+          buttonHTML = `<button class="KatilButonu btn-cik" data-id="${id}" style="background-color:#95a5a6;">Katıldın</button>`;
         }
       } else {
         if (inCooldown) {
@@ -297,12 +283,12 @@ async function loadEvents() {
           });
       });
 
-        document.querySelectorAll('.ok-ikonu').forEach(icon => {
+      document.querySelectorAll('.ok-ikonu').forEach(icon => {
           icon.addEventListener('click', async (e) => {
             const id = e.target.getAttribute('data-id');
             await showEventDetails(id);
           });
-        });
+      });
 
   } catch (error) {
       console.error("Veri çekme hatası:", error);
@@ -327,6 +313,7 @@ async function katil(docId) {
   }
 }
 
+// --- DETAY GÖSTERME (Açıklama + Katılımcılar) ---
 async function showEventDetails(docId) {
   if (!docId) return;
 
@@ -339,13 +326,16 @@ async function showEventDetails(docId) {
     const next = card.nextElementSibling;
     if (next && next.classList.contains('EtkinlikDetayInline') && next.dataset.id === docId) {
       next.remove();
+      icon.style.transform = "rotate(0deg)";
       return;
     }
+
+    icon.style.transform = "rotate(180deg)";
 
     const detailDiv = document.createElement('div');
     detailDiv.className = 'EtkinlikDetayInline';
     detailDiv.dataset.id = docId;
-    detailDiv.textContent = 'Yükleniyor...';
+    detailDiv.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-warning"></div> Yükleniyor...</div>';
     card.parentNode.insertBefore(detailDiv, card.nextSibling);
 
     const snap = await getDoc(doc(db, 'events', docId));
@@ -353,8 +343,27 @@ async function showEventDetails(docId) {
       detailDiv.textContent = 'Etkinlik bulunamadı.';
       return;
     }
-
     const data = snap.data();
+
+    let participantsHtml = '<span class="text-muted fst-italic small">Henüz kimse katılmamış.</span>';
+    
+    if (data.katilimcilar && data.katilimcilar.length > 0) {
+        const promises = data.katilimcilar.map(uid => getDoc(doc(db, "users", uid)));
+        const userSnaps = await Promise.all(promises);
+        
+        const namesList = userSnaps.map(us => {
+            if(us.exists()) {
+                const uData = us.data();
+                const uName = uData.adSoyad || uData.displayName || uData.email;
+                return `<li class="mb-1"><i class="fas fa-user-circle text-muted me-2"></i>${uName}</li>`;
+            } else {
+                return `<li class="mb-1 text-muted"><i class="fas fa-user-slash me-2"></i>Bilinmeyen Kullanıcı</li>`;
+            }
+        }).join('');
+        
+        participantsHtml = `<ul class="list-unstyled mb-0 ps-2" style="font-size:0.9rem;">${namesList}</ul>`;
+    }
+
     let timeStr = '-';
     if (data.olusturulmaTarihi) {
       const d = new Date(data.olusturulmaTarihi);
@@ -365,21 +374,28 @@ async function showEventDetails(docId) {
 
     const escapeHtml = (str) => {
       if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     };
-
     const aciklamaHtml = data.aciklama ? escapeHtml(data.aciklama) : '<span class="text-muted">Açıklama yok.</span>';
 
     detailDiv.innerHTML = `
-      <div style="display:flex; flex-direction:column;">
-        <div style="font-size:0.95rem; color:#222;"><strong>Oluşturan:</strong> ${data.olusturanEmail || '-'}</div>
-        <div style="font-size:0.9rem; color:#666; margin-top:6px;"><strong>Zaman:</strong> ${timeStr}</div>
-        <div class="detay-aciklama">${aciklamaHtml}</div>
+      <div class="row">
+        <div class="col-md-7 border-end">
+            <h6 class="fw-bold text-dark mb-2">📌 Etkinlik Detayı</h6>
+            <div class="detay-aciklama mb-3 text-secondary">${aciklamaHtml}</div>
+            <div class="small text-muted">
+                <div><strong>👑 Oluşturan:</strong> ${data.olusturanEmail || '-'}</div>
+                <div><strong>🕒 Oluşturulma Saati:</strong> ${timeStr}</div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <h6 class="fw-bold text-dark mb-2">
+                👥 Katılımcılar <span class="badge bg-warning text-white rounded-pill ms-1">${data.katilimciSayisi || 0}</span>
+            </h6>
+            <div class="bg-white p-2 rounded border shadow-sm" style="max-height: 150px; overflow-y: auto;">
+                ${participantsHtml}
+            </div>
+        </div>
       </div>
     `;
 
@@ -404,10 +420,14 @@ if(registerBtn) {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
+            await updateProfile(user, { displayName: name }); 
+
             await setDoc(doc(db, "users", user.uid), {
                 adSoyad: name,
+                displayName: name, 
                 kullaniciAdi: username || email.split('@')[0],
                 telefon: phone,
+                phone: phone, 
                 email: email,
                 kayitTarihi: new Date().toISOString()
             });
@@ -465,7 +485,7 @@ if(saveBtn) {
                 kontenjan: Number(kontenjan),
                 katilimciSayisi: 1,
                 katilimcilar: [currentUser.uid],
-                katilimGecmisi: {}, // Yeni alan: Her kullanıcının değişiklik sayısını tutar
+                katilimGecmisi: {}, 
                 olusturanEmail: currentUser.email,
                 olusturulmaTarihi: new Date().toISOString()
             });
@@ -485,7 +505,6 @@ if(saveBtn) {
     });
 }
 
-
 // --- PROFİL DÜZENLEME İŞLEMLERİ ---
 
 // A) Modalı Açma
@@ -497,13 +516,16 @@ if(btnEditOpen) {
         if(!currentUser) return;
         
         modalEditProfile.classList.remove('d-none');
-        document.getElementById('edit-fullname').value = currentUser.displayName || "";
+        
+        const currentName = document.getElementById('profile-name').textContent;
+        document.getElementById('edit-fullname').value = currentName !== "İsimsiz" ? currentName : "";
         
         try {
             const userDocRef = doc(db, "users", currentUser.uid);
             const userSnap = await getDoc(userDocRef);
             if(userSnap.exists()) {
-                document.getElementById('edit-phone').value = userSnap.data().phone || "";
+                const uData = userSnap.data();
+                document.getElementById('edit-phone').value = uData.telefon || uData.phone || "";
             }
         } catch(e) {
             console.log("Telefon çekme hatası", e);
@@ -539,19 +561,20 @@ if(btnSaveProfile) {
 
             await setDoc(doc(db, "users", currentUser.uid), {
                 displayName: newName,
+                adSoyad: newName, 
                 phone: newPhone,
+                telefon: newPhone,
                 email: currentUser.email
             }, { merge: true });
-
             
             modalEditProfile.classList.add('d-none');
             
-            // --- YENİ EKLENEN: Sidebar'daki ismi anında güncelle ---
             const sbName = document.getElementById('sidebar-username');
             if(sbName) sbName.textContent = newName;
-            // -----------------------------------------------------
 
             loadProfileData();
+
+            alert("Profil başarıyla güncellendi!");
 
         } catch (error) {
             console.error(error);

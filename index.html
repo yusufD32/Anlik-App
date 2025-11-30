@@ -11,14 +11,12 @@
 </head>
 <body>
 
-    <!-- Yükleniyor Ekranı -->
     <div id="loading">
         <div class="d-flex justify-content-center align-items-center vh-100 bg-white fixed-top" style="z-index:9999;">
             <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;"></div>
         </div>
     </div>
 
-    <!-- GİRİŞ EKRANI -->
     <div id="view-login" class="d-flex justify-content-center align-items-center vh-100 bg-white">
         <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
             <div class="text-center mb-4">
@@ -48,7 +46,6 @@
         </div>
     </div>
 
-    <!-- KAYIT EKRANI -->
     <div id="view-register" class="d-none">
         <div class="d-flex justify-content-center align-items-center vh-100 bg-white">
             <div class="card shadow-lg p-5 border-0 rounded-4" style="max-width: 450px; width: 100%;">
@@ -97,11 +94,9 @@
     </div>
 
 
-    <!-- ANA SAYFA -->
     <div id="view-home" class="container-fluid page-container d-none">
         <div class="row h-100">
             
-            <!-- Sol Sidebar -->
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
                 <div class="ProfilKutusu shadow-sm "  >
                           <img src="./src/images/avatar3.png" alt="Profil" onclick="router('view-profile')">
@@ -112,15 +107,13 @@
 </div>
                 
                 
-               <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill" >
+                <button id="logout-btn" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill" >
                         <i class="fas fa-sign-out-alt me-2" ></i> Çıkış Yap
                     </button>
             </div>
 
-            <!-- Ana İçerik -->
             <div class="col-md-9 AnaIcerik">
 
-                <!-- Üst Navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-light rounded-4 shadow-sm mb-4 p-3">
                     <div class="container-fluid">
                         <span class="navbar-brand fw-bold text-warning d-md-none">Anlık</span>
@@ -151,18 +144,15 @@
                     </div>
                 </nav>
 
-                <!-- Etkinlik Listesi -->
                 <div id="events-list"></div>
 
             </div>
         </div>
     </div>
 
-    <!-- PROFİL SAYFASI -->
     <div id="view-profile" class="container-fluid page-container d-none">
         <div class="row h-100">
             
-            <!-- Sol Sidebar -->
             <div class="col-md-3 KenarCubugu d-flex flex-column shadow-sm">
                 <div class="Logo" onclick="router('view-home')" style="cursor: pointer;">
                     <i class="fa-solid fa-arrow-left text-warning fa-2x"></i>
@@ -171,7 +161,7 @@
                 <div class="KategoriKutusu mt-4">
                     <h5 class="KategoriBaslik">MENÜ</h5>
                     <ul class="KategoriListesi">
-                        <li class="KategoriOgesi" onclick="router('view-home')">ANA SAYFA</li>
+                        <li class="KategoriOgesi" onclick="router('view-home')" >ANA SAYFA</li>
                         <li class="KategoriOgesi Aktif">PROFİLİM</li>
                     </ul>
                     <button id="logout-btn-2" class="btn btn-outline-danger w-100 mt-5 fw-bold rounded-pill">
@@ -180,10 +170,8 @@
                 </div>
             </div>
 
-            <!-- Profil İçeriği -->
             <div class="col-md-9 AnaIcerik">
                 
-                <!-- Profil Kartı -->
                 <div class="card border-0 shadow-sm mb-4 rounded-4" style="background-color: #fdf6e3;">
                     <div class="card-body p-4 d-flex align-items-center">
                         
@@ -193,8 +181,16 @@
 
                         <div class="ms-4">
                             <h2 class="fw-bold text-dark mb-0" id="profile-name">Yükleniyor...</h2>
-                            <p class="text-muted mb-2" id="profile-username">@...</p>
-                            <p class="mb-0 text-muted" id="profile-email">email@...</p>
+                            <p class="text-muted mb-1" id="profile-username">@...</p>
+                            <p class="mb-1 text-muted small" id="profile-email">email@...</p>
+                            
+                            <p class="mb-2 text-muted small" id="profile-phone">
+                                <i class="fas fa-phone-alt me-1"></i> Yükleniyor...
+                            </p>
+
+                            <button id="btn-edit-profile-open" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-bold mt-1">
+                                <i class="fas fa-pen me-2"></i> Profili Düzenle
+                            </button>
 
                             <div class="d-flex gap-3 mt-3">
                                 <span class="badge bg-white text-dark p-2 border shadow-sm">
@@ -208,11 +204,9 @@
                     </div>
                 </div>
 
-                <!-- Oluşturduğum Etkinlikler -->
                 <h5 class="fw-bold mb-3 text-secondary">Oluşturduğum Etkinlikler</h5>
                 <div id="list-created">Yükleniyor...</div>
 
-                <!-- Katıldığım Etkinlikler -->
                 <h5 class="fw-bold mb-3 mt-5 text-secondary">Katıldığım Etkinlikler</h5>
                 <div id="list-joined">Yükleniyor...</div>
 
@@ -220,7 +214,6 @@
         </div>
     </div>
 
-    <!-- ETKİNLİK OLUŞTURMA MODAL -->
     <div id="view-create" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
         <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 500px; max-width:95%; background: #fff8e1;">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -266,7 +259,6 @@
         </div>
     </div>
     
-    <!-- HAKKIMIZDA MODAL -->
     <div id="view-about" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; display:flex; justify-content:center; align-items:center;">
         <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 520px; max-width:95%; background: #fff;">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -292,6 +284,30 @@
             </div>
         </div>
     </div>
+    
+    <div id="view-edit-profile" class="d-none" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10001; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px);">
+        <div class="card p-4 rounded-4 shadow-lg border-0" style="width: 450px; background: #fff;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold text-dark m-0">Profili Düzenle</h4>
+                <button id="btn-close-edit-profile" class="btn-close"></button>
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Ad Soyad</label>
+                <input type="text" id="edit-fullname" class="form-control shadow-sm">
+            </div>
+
+            <div class="mb-3">
+                <label class="fw-bold small text-muted">Telefon Numarası</label>
+                <input type="text" id="edit-phone" class="form-control shadow-sm">
+            </div>
+
+            <button id="btn-save-profile" class="btn btn-warning w-100 text-white fw-bold py-2 rounded-pill shadow mt-2">
+                Değişiklikleri Kaydet
+            </button>
+        </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
