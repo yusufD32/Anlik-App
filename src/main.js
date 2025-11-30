@@ -4,7 +4,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 
 
-// 1. IMPORTLARI GÜNCELLEDİM (updateProfile ve setDoc eklendi)
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import { collection, getDocs, addDoc, doc, getDoc, arrayUnion, increment, updateDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase.js";
@@ -28,7 +27,7 @@ const router = (viewId) => {
   }
 };
 
-// --- 2. PROFİL VERİLERİNİ YÜKLEME FONKSİYONUNU GÜNCELLEDİM ---
+// --- PROFİL VERİLERİNİ YÜKLE ---
 async function loadProfileData() {
     if(!currentUser) return;
 
@@ -39,7 +38,7 @@ async function loadProfileData() {
     const displayName = currentUser.displayName || currentUser.email;
     document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${displayName}&background=random&size=200`;
 
-    // İsmi yazdır (Varsa ismi, yoksa "İsim girilmemiş" yazsın)
+    // İsmi yazdır
     const fullNameEl = document.getElementById('profile-fullname');
     if(currentUser.displayName) {
         fullNameEl.textContent = currentUser.displayName;
@@ -49,16 +48,14 @@ async function loadProfileData() {
 
     // B) Firestore'dan Telefon Numarasını Çek
     const phoneEl = document.getElementById('profile-phone');
-    phoneEl.textContent = "Yükleniyor..."; // Bekleme yazısı
+    phoneEl.textContent = "Yükleniyor..."; 
 
     try {
-        // 'users' koleksiyonundan kullanıcının dökümanını bul
         const userDocRef = doc(db, "users", currentUser.uid);
         const userSnap = await getDoc(userDocRef);
         
         if (userSnap.exists()) {
             const userData = userSnap.data();
-            // Telefon varsa yaz, yoksa uyarı ver
             phoneEl.textContent = userData.phone || "Telefon eklenmemiş";
         } else {
             phoneEl.textContent = "Telefon eklenmemiş";
@@ -68,8 +65,6 @@ async function loadProfileData() {
         phoneEl.textContent = "-";
     }
 
-
-    // --- Buradan aşağısı senin eski istatistik kodların (AYNI KALDI) ---
     const listCreated = document.getElementById('list-created');
     const listJoined = document.getElementById('list-joined');
 
@@ -87,23 +82,19 @@ async function loadProfileData() {
         snapshot.forEach(docSnap => {
             const data = docSnap.data();
 
-            // Basit Kart HTML'i
             const miniCard = `
             <div class="EtkinlikKartlari shadow-sm bg-white mb-2" style="height:auto; min-height:80px;">
                 <div class="EtkinlikBaslik ps-3">
                     ${data.baslik} <br> 
                     <small class="text-muted fw-normal">${data.tarih || ''} - ${data.saat || ''}</small>
                 </div>
-                
             </div>`;
 
-            // A) Oluşturduklarım
             if (data.olusturanEmail === currentUser.email) {
                 createdHTML += miniCard;
                 createdCount++;
             }
 
-            // B) Katıldıklarım
             if (data.katilimcilar && data.katilimcilar.includes(currentUser.uid)) {
                 joinedHTML += miniCard;
                 joinedCount++;
@@ -136,6 +127,14 @@ onAuthStateChanged(auth, (user) => {
 
     if(userEmailSpan) userEmailSpan.textContent = user.email;
     if(logoutBtn) logoutBtn.classList.remove('d-none');
+
+    // --- YENİ EKLENEN: Sidebar'daki Hoşgeldiniz kısmını güncelle ---
+    const sidebarNameLabel = document.getElementById('sidebar-username');
+    if(sidebarNameLabel) {
+        // İsim varsa ismini, yoksa emailin başını al
+        sidebarNameLabel.textContent = user.displayName || user.email.split('@')[0];
+    }
+    // -----------------------------------------------------------
 
     router('view-home');
     loadEvents(); 
@@ -170,7 +169,7 @@ const logoutBtn = document.getElementById('logout-btn');
 if(logoutBtn) {
   logoutBtn.addEventListener('click', () => signOut(auth));
 }
-// Çıkış Yap Butonu 2 (Profildeki)
+// Çıkış Yap Butonu 2
 const logoutBtn2 = document.getElementById('logout-btn-2');
 if(logoutBtn2) {
   logoutBtn2.addEventListener('click', () => signOut(auth));
@@ -190,34 +189,27 @@ async function loadEvents() {
       return;
     }
 
-    // Tüm etkinlikleri array'e koy
     const events = [];
     snapshot.forEach(docSnap => {
       events.push({ id: docSnap.id, data: docSnap.data() });
     });
 
-    // En yenileri önce: oluşturulma zamanına göre ters sırala
     events.sort((a, b) => {
       const timeA = a.data.olusturulmaTarihi || '';
       const timeB = b.data.olusturulmaTarihi || '';
       return timeB.localeCompare(timeA);
     });
 
-    // Sıralanmış etkinlikleri HTML'e dönüştür
     events.forEach(({ id, data }) => {
       const userJoined = data.katilimcilar && currentUser && data.katilimcilar.includes(currentUser.uid)
 
       const html = `
 <div class="EtkinlikKartlari shadow-sm">
-    
     <img src="https://ui-avatars.com/api/?name=${data.olusturanEmail}&background=random" class="KullaniciProfil">
-    
     <div class="EtkinlikBaslik" style="padding-bottom: 10px;">
         <div class="d-flex justify-content-between align-items-center pe-5">
             <span style="font-size: 1.2rem;">${data.baslik}</span>
-            
         </div>
-
         <div class="mt-2 mb-2">
             <small style="font-weight:normal; font-size:0.9rem; color:#666;">
                 <i class="fas fa-map-marker-alt text-danger me-1"></i> ${data.konum}
@@ -227,11 +219,8 @@ async function loadEvents() {
                 <i class="far fa-calendar-alt text-warning me-1"></i> ${data.tarih || ''} 
                 <i class="far fa-clock text-warning ms-2 me-1"></i> ${data.saat || ''}
             </span>
-
-        
     </div>
     
-
     <div class="KartAksiyonlari" style="align-self: center;">
         <button class="KatilButonu btn-katil" data-id="${id}" ${userJoined ? 'disabled' : ''}>
             ${userJoined ? 'Katıldın' : 'Katıl'}
@@ -248,7 +237,6 @@ async function loadEvents() {
       eventsContainer.innerHTML += html;
     });
 
-      
       document.querySelectorAll('.btn-katil').forEach(btn => {
           btn.addEventListener('click', (e) => {
               const id = e.target.getAttribute('data-id');
@@ -256,7 +244,6 @@ async function loadEvents() {
           });
       });
 
-        // Detay açma/kapama için ok ikonuna tıklama dinleyicisi
         document.querySelectorAll('.ok-ikonu').forEach(icon => {
           icon.addEventListener('click', async (e) => {
             const id = e.target.getAttribute('data-id');
@@ -276,12 +263,10 @@ async function katil(docId) {
   
   try {
       const eventRef = doc(db, "events", docId);
-      
       await updateDoc(eventRef, {
           katilimcilar: arrayUnion(currentUser.uid),
           katilimciSayisi: increment(1)
       });
-      
       loadEvents(); 
   } catch (error) {
       console.error("Katılma hatası:", error);
@@ -289,32 +274,27 @@ async function katil(docId) {
   }
 }
 
-// Etkinlik detaylarını getir ve göster (sade ve anlaşılır)
 async function showEventDetails(docId) {
   if (!docId) return;
 
   try {
-    // Hangi karta ait olduğunu bul
     const icon = document.querySelector(`.ok-ikonu[data-id="${docId}"]`);
     if (!icon) return;
     const card = icon.closest('.EtkinlikKartlari');
     if (!card) return;
 
-    // Zaten altında bir detay div'i varsa onu kapat (toggle)
     const next = card.nextElementSibling;
     if (next && next.classList.contains('EtkinlikDetayInline') && next.dataset.id === docId) {
       next.remove();
       return;
     }
 
-    // Geçici yükleniyor göstergesi ekle
     const detailDiv = document.createElement('div');
     detailDiv.className = 'EtkinlikDetayInline';
     detailDiv.dataset.id = docId;
     detailDiv.textContent = 'Yükleniyor...';
     card.parentNode.insertBefore(detailDiv, card.nextSibling);
 
-    // Veriyi çek
     const snap = await getDoc(doc(db, 'events', docId));
     if (!snap.exists()) {
       detailDiv.textContent = 'Etkinlik bulunamadı.';
@@ -322,8 +302,6 @@ async function showEventDetails(docId) {
     }
 
     const data = snap.data();
-
-    // Saat:dakika biçiminde zaman
     let timeStr = '-';
     if (data.olusturulmaTarihi) {
       const d = new Date(data.olusturulmaTarihi);
@@ -332,7 +310,6 @@ async function showEventDetails(docId) {
       timeStr = `${hh}:${mm}`;
     }
 
-    // Açıklamayı güvenli şekilde göster (basit kaçış)
     const escapeHtml = (str) => {
       if (!str) return '';
       return String(str)
@@ -345,7 +322,6 @@ async function showEventDetails(docId) {
 
     const aciklamaHtml = data.aciklama ? escapeHtml(data.aciklama) : '<span class="text-muted">Açıklama yok.</span>';
 
-    // Basit, okunaklı detay içeriği
     detailDiv.innerHTML = `
       <div style="display:flex; flex-direction:column;">
         <div style="font-size:0.95rem; color:#222;"><strong>Oluşturan:</strong> ${data.olusturanEmail || '-'}</div>
@@ -366,7 +342,6 @@ if(showCreateBtn) showCreateBtn.addEventListener('click', () => router('view-cre
 const cancelCreateBtn = document.getElementById('btn-cancel-create'); 
 if(cancelCreateBtn) cancelCreateBtn.addEventListener('click', () => router('view-home'));
 
-// About/Contact overlay toggles (logo click opens it)
 const openAboutBtn = document.getElementById('btn-open-about');
 const aboutOverlay = document.getElementById('view-about');
 const closeAboutBtn = document.getElementById('btn-close-about');
@@ -382,12 +357,9 @@ if (closeAboutBtn && aboutOverlay) {
   });
 }
 
-
-
 const saveBtn = document.getElementById('btn-save');
 if(saveBtn) {
     saveBtn.addEventListener('click', async () => {
-        // 1. Verileri HTML'den al
         const baslik = document.getElementById('create-title').value;
         const kontenjan = document.getElementById('create-quota').value;
         const konum = document.getElementById('create-location').value;
@@ -395,11 +367,9 @@ if(saveBtn) {
         const saat = document.getElementById('create-time').value; 
         const aciklama = document.getElementById('create-desc').value;
 
-        // 2. Boş alan kontrolü
         if(!baslik || !konum || !tarih || !saat) return alert("Lütfen gerekli alanları doldurun!");
 
         try {
-            // 3. Firebase'e Kaydet
             await addDoc(collection(db, "events"), {
                 baslik, 
                 konum,
@@ -413,14 +383,12 @@ if(saveBtn) {
                 olusturulmaTarihi: new Date().toISOString()
             });
             
-            // 4. Formu Temizle
             document.getElementById('create-title').value = "";
             document.getElementById('create-location').value = "";
             document.getElementById('create-desc').value = "";
             document.getElementById('create-date').value = "";
             document.getElementById('create-time').value = "";
             
-            // 5. Modalı kapat ve listeyi yenile
             document.getElementById('view-create').classList.add('d-none');
             loadEvents();
             
@@ -431,7 +399,7 @@ if(saveBtn) {
 }
 
 
-// --- 3. YENİ EKLENEN KISIM: PROFİL DÜZENLEME İŞLEMLERİ ---
+// --- PROFİL DÜZENLEME İŞLEMLERİ ---
 
 // A) Modalı Açma
 const btnEditOpen = document.getElementById('btn-edit-profile-open');
@@ -441,13 +409,9 @@ if(btnEditOpen) {
     btnEditOpen.addEventListener('click', async () => {
         if(!currentUser) return;
         
-        // Modalı göster
         modalEditProfile.classList.remove('d-none');
-        
-        // Mevcut ismi inputa yaz
         document.getElementById('edit-fullname').value = currentUser.displayName || "";
         
-        // Veritabanından telefonu çekip inputa yaz
         try {
             const userDocRef = doc(db, "users", currentUser.uid);
             const userSnap = await getDoc(userDocRef);
@@ -475,44 +439,41 @@ if(btnSaveProfile) {
         const newName = document.getElementById('edit-fullname').value;
         const newPhone = document.getElementById('edit-phone').value;
         
-        // Butonu "Kaydediliyor..." yap
         const originalText = btnSaveProfile.textContent;
         btnSaveProfile.textContent = "Kaydediliyor...";
         btnSaveProfile.disabled = true;
 
         try {
-            // 1. Firebase Auth Profilini Güncelle (İsim için)
             if(currentUser.displayName !== newName) {
                 await updateProfile(currentUser, {
                     displayName: newName
                 });
             }
 
-            // 2. Firestore 'users' koleksiyonuna telefon ve ismi kaydet
-            // setDoc: Varsa günceller, yoksa oluşturur (merge:true sayesinde)
             await setDoc(doc(db, "users", currentUser.uid), {
                 displayName: newName,
                 phone: newPhone,
                 email: currentUser.email
             }, { merge: true });
 
-            // Başarılı
             
             modalEditProfile.classList.add('d-none');
             
-            // Profil sayfasını yenile (ekrandaki veriler güncellensin)
+            // --- YENİ EKLENEN: Sidebar'daki ismi anında güncelle ---
+            const sbName = document.getElementById('sidebar-username');
+            if(sbName) sbName.textContent = newName;
+            // -----------------------------------------------------
+
             loadProfileData();
 
         } catch (error) {
             console.error(error);
             alert("Hata oluştu: " + error.message);
         } finally {
-            // Butonu eski haline getir
             btnSaveProfile.textContent = originalText;
             btnSaveProfile.disabled = false;
         }
     });
 }
-
 
 window.router = router;
